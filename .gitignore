@@ -1,0 +1,4 @@
+.claude/hooks/.state/
+.claude/hooks/capture-errors.log
+.claude/settings.local.json
+.DS_Store

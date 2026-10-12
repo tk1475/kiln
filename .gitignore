@@ -2,3 +2,21 @@
 .claude/hooks/capture-errors.log
 .claude/settings.local.json
 .DS_Store
+
+# Secrets and local credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+cookies*.json
+*.har
+
+# Dependencies / build output
+node_modules/
+.next/
+dist/
+.vercel/
+
+# Discovery screenshots that show account details (keep local only)
+docs/reference/private/

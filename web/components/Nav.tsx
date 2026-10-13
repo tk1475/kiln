@@ -21,18 +21,18 @@ const STUDIOS: Item[] = [
 ];
 
 function NavLink({ item, path }: { item: Item; path: string }) {
-  const active = path === item.href || path.startsWith(`${item.href}/`) && item.href !== "/api";
+  const active = path === item.href || (path.startsWith(`${item.href}/`) && item.href !== "/api");
   return (
     <li className="shrink-0">
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[15px] font-medium transition-colors ${
-          active ? "text-fg" : "text-muted hover:text-fg"
+        className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
+          active ? "bg-fg text-bg" : "text-fg/70 hover:text-fg"
         }`}
       >
         {item.label}
-        {item.badge && <span className={item.badge === "Top" ? "badge !bg-fg !text-bg" : "badge"}>{item.badge}</span>}
+        {item.badge && <span className={item.badge === "Top" ? "badge !bg-panel-2" : "badge"}>{item.badge}</span>}
       </Link>
     </li>
   );
@@ -41,18 +41,20 @@ function NavLink({ item, path }: { item: Item; path: string }) {
 export default function Nav() {
   const path = usePathname();
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur">
-      <nav className="flex h-14 items-center gap-2 overflow-x-auto px-4" aria-label="Primary">
-        <Link href="/explore" aria-label="Kiln home" className="mr-3 shrink-0">
-          <span aria-hidden className="grid h-9 w-9 place-items-center rounded-xl bg-fg text-bg">
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-              <path d="M12 3c3 4 5 6.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.6 1.2 2.5 2 2.5 0-3 0-5 1-8Z" />
-            </svg>
-          </span>
+    <header className="sticky top-0 z-30 bg-bg/85 backdrop-blur-md">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center gap-2 overflow-x-auto px-4" aria-label="Primary">
+        <Link href="/explore" className="mr-4 flex shrink-0 items-center gap-2 text-lg font-medium tracking-tight">
+          <svg aria-hidden viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor">
+            <path d="M12 2c3.6 4.6 6 7.6 6 11.6A6 6 0 0 1 6 13.6c0-2.4 1.2-4.2 2.4-5.4.4 1.9 1.4 3 2.4 3 0-3.6 0-6 1.2-9.2Z" />
+          </svg>
+          Kiln
         </Link>
-        <ul className="flex items-center gap-1">{CORE.map((i) => <NavLink key={i.href} item={i} path={path} />)}</ul>
-        <span aria-hidden className="mx-2 h-5 w-px shrink-0 bg-line" />
-        <ul className="flex items-center gap-1">{STUDIOS.map((i) => <NavLink key={i.href} item={i} path={path} />)}</ul>
+        <ul className="flex items-center gap-0.5">{CORE.map((i) => <NavLink key={i.href} item={i} path={path} />)}</ul>
+        <span aria-hidden className="mx-2 h-4 w-px shrink-0 bg-line" />
+        <ul className="flex items-center gap-0.5">{STUDIOS.map((i) => <NavLink key={i.href} item={i} path={path} />)}</ul>
+        <Link href="/image" className="btn-ember ml-auto hidden shrink-0 items-center gap-2 rounded-full py-1.5 pl-4 pr-1.5 md:flex">
+          Start creating <span className="arrow-dot" aria-hidden>↗</span>
+        </Link>
       </nav>
     </header>
   );

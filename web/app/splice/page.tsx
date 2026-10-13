@@ -59,8 +59,8 @@ export default function SplicePage() {
 
   return (
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[380px_1fr]">
-      <aside className="flex flex-col gap-4 rounded-2xl border border-line bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <h1 className="font-display text-4xl uppercase">Splice</h1>
+      <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
+        <h1 className="font-display text-4xl">Splice</h1>
 
         <Step n={1} title="Add shots">
           {library.length === 0 ? (
@@ -72,7 +72,7 @@ export default function SplicePage() {
               {library.map((a) => (
                 <li key={a.id}>
                   <button onClick={() => setTimeline((t) => [...t, a])} aria-label={`Add ${a.kind === "image" ? "image" : "clip"} to timeline`}
-                    className="relative block aspect-square w-full overflow-hidden rounded-lg border border-line hover:border-ember">
+                    className="relative block aspect-square w-full overflow-hidden rounded-lg border border-line hover:border-fg">
                     <Media asset={a} />
                     <span className="absolute bottom-0.5 right-0.5 rounded bg-black/60 px-1 text-[10px]">{a.kind === "image" ? "IMG" : `${a.durationS}s`}</span>
                   </button>
@@ -122,13 +122,13 @@ export default function SplicePage() {
             <button onClick={() => abortRef.current?.abort()} className="mt-2 w-full rounded-xl bg-panel-2 py-2 text-sm">Cancel</button>
           </div>
         ) : (
-          <button onClick={render} disabled={timeline.length === 0} className="btn-ember rounded-xl py-3 font-semibold disabled:opacity-40">Render edit</button>
+          <button onClick={render} disabled={timeline.length === 0} className="btn-ember rounded-full py-3 font-semibold disabled:opacity-40">Render edit</button>
         )}
         <p className="text-[11px] text-muted">Cut together on your device in real time. Keep this tab visible while it renders.</p>
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
       </aside>
 
-      <section className="flex min-h-[420px] items-center justify-center rounded-2xl border border-line bg-panel p-4">
+      <section className="flex min-h-[420px] items-center justify-center rounded-3xl bg-panel p-4">
         {result ? <Result asset={result} /> : <div className="flex flex-col items-center gap-3 text-center"><img src={icon3d("filmreel")} alt="" className="h-16 w-16" /><p className="max-w-xs text-center text-muted">Build a timeline of stills and clips, add a soundtrack, and render one shareable edit.</p></div>}
       </section>
     </div>

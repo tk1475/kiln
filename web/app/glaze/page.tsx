@@ -49,27 +49,27 @@ export default function GlazePage() {
 
   return (
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[340px_1fr]">
-      <aside className="flex flex-col gap-4 rounded-2xl border border-line bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <h1 className="font-display text-4xl uppercase">Glaze</h1>
+      <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
+        <h1 className="font-display text-4xl">Glaze</h1>
         <Step n={1} title="Image"><SourcePicker value={source} onChange={(a) => { setSource(a); setSaved(undefined); }} /></Step>
         <Step n={2} title="Intensity">
-          <input type="range" min={0} max={1} step={0.05} value={k} onChange={(e) => setK(Number(e.target.value))} className="w-full accent-[var(--ember)]" aria-label="Intensity" />
+          <input type="range" min={0} max={1} step={0.05} value={k} onChange={(e) => setK(Number(e.target.value))} className="w-full accent-[var(--fg)]" aria-label="Intensity" />
         </Step>
-        <button onClick={exportFull} disabled={!img} className="btn-ember rounded-xl py-3 font-semibold disabled:opacity-40">Save &amp; download</button>
+        <button onClick={exportFull} disabled={!img} className="btn-ember rounded-full py-3 font-semibold disabled:opacity-40">Save &amp; download</button>
         <p className="text-[11px] text-muted">Effects are applied on your device. No AI model is involved.</p>
         <p aria-live="polite" className="text-sm text-ember-2">{saved}</p>
       </aside>
 
       <section className="flex flex-col gap-4">
-        <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-line bg-panel p-4">
+        <div className="flex min-h-[360px] items-center justify-center rounded-3xl bg-panel p-4">
           {img ? <canvas ref={preview} className="max-h-[60vh] max-w-full rounded-xl" aria-label={`Preview with ${glaze.name}`} />
             : <div className="flex flex-col items-center gap-3 text-center"><img src={icon3d("paintbrush")} alt="" className="h-16 w-16" /><p className="text-muted">Pick an image to glaze.</p></div>}
         </div>
         <div role="radiogroup" aria-label="Effect" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {GLAZES.map((g) => (
             <button key={g.id} role="radio" aria-checked={g.id === glaze.id} onClick={() => setGlaze(g)}
-              className={`rounded-2xl border p-3 text-left ${g.id === glaze.id ? "border-ember bg-panel-2" : "border-line bg-panel hover:border-muted"}`}>
-              <span className="block font-display text-lg uppercase">{g.name}</span>
+              className={`rounded-3xl border-2 p-4 text-left ${g.id === glaze.id ? "border-fg bg-panel" : "border-transparent bg-panel hover:bg-panel-2"}`}>
+              <span className="block font-display text-lg">{g.name}</span>
               <span className="text-xs text-muted">{g.hint}</span>
             </button>
           ))}

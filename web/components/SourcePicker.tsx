@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Asset, LABEL_TEXT, getAsset, listAssets, saveAsset } from "@/lib/assets";
@@ -10,8 +11,19 @@ import { useObjectUrl } from "@/components/useObjectUrl";
 
 type Props = { value?: Asset; onChange: (a: Asset) => void };
 
-/** Imports a library sample as a local asset so every tool can read it as a blob. */
-export async function importSample(name: string): Promise<Asset> {
+const inflight = new Map<string, Promise<Asset>>();
+
+/** Imports a library sample as a local asset so every tool can read it as a blob. Concurrent calls share one import. */
+export function importSample(name: string): Promise<Asset> {
+  let p = inflight.get(name);
+  if (!p) {
+    p = doImport(name).finally(() => inflight.delete(name));
+    inflight.set(name, p);
+  }
+  return p;
+}
+
+async function doImport(name: string): Promise<Asset> {
   const existing = (await listAssets("image")).find((a) => a.label === "sample" && a.presetId === name);
   if (existing) return existing;
   const res = await fetch(libraryUrl(name), { mode: "cors" });
@@ -105,8 +117,8 @@ function Picker({ value, onChange }: Props) {
           {SAMPLES.map((n) => (
             <li key={n}>
               <button onClick={() => pickSample(n)} aria-label="Use sample" aria-pressed={value?.presetId === n}
-                className={`relative block aspect-square w-full overflow-hidden rounded-lg border-2 ${value?.presetId === n ? "border-ember" : "border-transparent"}`}>
-                <img src={libraryUrl(n)} alt="" loading="lazy" className={`h-full w-full object-cover ${loading === n ? "opacity-40" : ""}`} />
+                className={`relative block aspect-square w-full overflow-hidden rounded-lg border-2 ${value?.presetId === n ? "border-fg" : "border-transparent"}`}>
+                <Image src={libraryUrl(n)} alt="" fill sizes="90px" className={`object-cover ${loading === n ? "opacity-40" : ""}`} />
               </button>
             </li>
           ))}
@@ -126,7 +138,7 @@ function Thumb({ asset, active, onPick }: { asset: Asset; active: boolean; onPic
   return (
     <li>
       <button onClick={onPick} aria-pressed={active} aria-label={asset.prompt ?? LABEL_TEXT[asset.label]}
-        className={`block aspect-square w-full overflow-hidden rounded-lg border-2 ${active ? "border-ember" : "border-transparent"}`}>
+        className={`block aspect-square w-full overflow-hidden rounded-lg border-2 ${active ? "border-fg" : "border-transparent"}`}>
         {url && <img src={url} alt="" className="h-full w-full object-cover" />}
       </button>
     </li>

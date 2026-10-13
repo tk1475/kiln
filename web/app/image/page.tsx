@@ -29,7 +29,7 @@ export default function ImagePage() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    listAssets("image").then(setAssets);
+    listAssets("image").then((a) => setAssets(a.filter((x) => x.label === "ai-generated")));
     fetch("/api/image").then((r) => r.json()).then((d) => setConfigured(d.configured)).catch(() => setConfigured(false));
   }, []);
 
@@ -98,7 +98,7 @@ export default function ImagePage() {
       {configured === false && (
         <div role="status" className="mt-4 rounded-xl border border-line bg-panel px-4 py-3 text-sm text-muted">
           Image generation isn&apos;t configured on this deployment yet (missing model credentials). You can still use{" "}
-          <Link href="/video" className="text-ember underline">Video</Link> with your own images.
+          <Link href="/video" className="text-ember-2 underline">Video</Link> with your own images.
         </div>
       )}
 
@@ -110,8 +110,8 @@ export default function ImagePage() {
                 style={{ transform: `rotate(${(i - 2) * 7}deg) translateY(${Math.abs(i - 2) * 10}px)`, zIndex: 5 - Math.abs(i - 2) }} />
             ))}
           </div>
-          <h1 className="font-display text-5xl uppercase sm:text-6xl">
-            Fire up an <span className="bg-gradient-to-r from-ember to-ember-2 bg-clip-text text-transparent">image</span>
+          <h1 className="font-display text-5xl sm:text-6xl">
+            Fire up an <span className="text-muted">image</span>
           </h1>
           <p className="mt-3 max-w-md text-muted">
             Describe a scene. Kiln renders it with FLUX.1 schnell, an open model, then you can set it in motion.
@@ -121,7 +121,7 @@ export default function ImagePage() {
               <li key={ex}>
                 <button
                   onClick={() => { setPrompt(ex); inputRef.current?.focus(); }}
-                  className="w-full rounded-xl border border-line bg-panel px-4 py-3 text-left text-sm text-muted transition-colors hover:border-ember/60 hover:text-fg"
+                  className="w-full rounded-xl border border-line bg-panel px-4 py-3 text-left text-sm text-muted transition-colors hover:border-fg/25 hover:text-fg"
                 >
                   {ex}
                 </button>
@@ -132,7 +132,7 @@ export default function ImagePage() {
       ) : (
         <section aria-label="Results" className="mt-6 columns-1 gap-4 sm:columns-2 lg:columns-3">
           {jobs.map((j) => (
-            <div key={j.id} className="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-line bg-panel">
+            <div key={j.id} className="mb-4 break-inside-avoid overflow-hidden rounded-3xl bg-panel">
               {j.status === "running" ? (
                 <div className="kiln-loading relative" style={{ aspectRatio: ratio(j.aspect) }}>
                   <span className="absolute bottom-3 left-3 rounded-full bg-black/40 px-2 py-1 text-xs text-fg/80">Firing…</span>
@@ -157,7 +157,7 @@ export default function ImagePage() {
 
       <form
         onSubmit={(e) => { e.preventDefault(); generate(); }}
-        className="fixed inset-x-0 bottom-4 z-20 mx-auto w-[calc(100%-2rem)] max-w-3xl rounded-2xl border border-line bg-panel/95 p-3 shadow-2xl backdrop-blur"
+        className="fixed inset-x-0 bottom-4 z-20 mx-auto w-[calc(100%-2rem)] max-w-3xl rounded-3xl bg-panel/95 p-3 shadow-2xl backdrop-blur"
       >
         <label htmlFor="prompt" className="sr-only">Prompt</label>
         <textarea
@@ -210,7 +210,7 @@ function ResultCard({ asset, onRemix, onDelete }: { asset: Asset; onRemix: () =>
   const url = useObjectUrl(asset.blob);
   const [copied, setCopied] = useState(false);
   return (
-    <figure className="group mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-line bg-panel">
+    <figure className="group mb-4 break-inside-avoid overflow-hidden rounded-3xl bg-panel">
       <div className="relative" style={{ aspectRatio: `${asset.width} / ${asset.height}` }}>
         {url && (
           <img src={url} alt={asset.prompt ?? "Generated image"} className="h-full w-full object-cover" />

@@ -53,8 +53,9 @@ function draw(ctx: CanvasRenderingContext2D, img: HTMLImageElement, layout: Layo
     ctx.fillRect(0, 0, W, H);
   }
 
-  ctx.font = `${big}px ${display}`;
-  const headLines = wrap(ctx, copy.headline.toUpperCase(), textW);
+  ctx.letterSpacing = `${-0.04 * big}px`;
+  ctx.font = `600 ${big}px ${display}`;
+  const headLines = wrap(ctx, copy.headline, textW);
   ctx.font = `${Math.round(big * 0.32)}px system-ui, sans-serif`;
   const subLines = wrap(ctx, copy.sub, textW);
   const ctaH = copy.cta ? Math.round(big * 0.55) : 0;
@@ -69,8 +70,10 @@ function draw(ctx: CanvasRenderingContext2D, img: HTMLImageElement, layout: Layo
   ctx.textAlign = align;
   ctx.textBaseline = "top";
   ctx.fillStyle = "#f4f4f5";
-  ctx.font = `${big}px ${display}`;
+  ctx.letterSpacing = `${-0.04 * big}px`;
+  ctx.font = `600 ${big}px ${display}`;
   for (const l of headLines) { ctx.fillText(l, x, y); y += big * 0.98; }
+  ctx.letterSpacing = "0px";
   ctx.fillStyle = "rgba(244,244,245,0.75)";
   ctx.font = `${Math.round(big * 0.32)}px system-ui, sans-serif`;
   y += big * 0.08;
@@ -81,14 +84,11 @@ function draw(ctx: CanvasRenderingContext2D, img: HTMLImageElement, layout: Layo
     ctx.font = `600 ${Math.round(ctaH * 0.42)}px system-ui, sans-serif`;
     const w = ctx.measureText(copy.cta).width + ctaH;
     const bx = align === "center" ? x - w / 2 : x;
-    const g = ctx.createLinearGradient(bx, 0, bx + w, 0);
-    g.addColorStop(0, "#ff6a3d");
-    g.addColorStop(1, "#ffb547");
-    ctx.fillStyle = g;
+    ctx.fillStyle = "#d7f45c";
     ctx.beginPath();
     ctx.roundRect(bx, y, w, ctaH, ctaH / 2);
     ctx.fill();
-    ctx.fillStyle = "#1a0d06";
+    ctx.fillStyle = "#111111";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(copy.cta, bx + w / 2, y + ctaH / 2);
@@ -106,8 +106,8 @@ export default function BillboardPage() {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const fam = getComputedStyle(document.documentElement).getPropertyValue("--font-anton").trim() || "sans-serif";
-    document.fonts.load(`80px ${fam}`).then(() => setDisplay(fam));
+    const fam = getComputedStyle(document.documentElement).getPropertyValue("--font-geist-sans").trim() || "sans-serif";
+    document.fonts.load(`600 80px ${fam}`).then(() => setDisplay(fam));
   }, []);
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export default function BillboardPage() {
     <label className="block text-xs text-muted">
       {label}
       <input value={copy[k]} maxLength={max} onChange={(e) => setCopy((c) => ({ ...c, [k]: e.target.value }))}
-        className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-fg outline-none focus:border-ember" />
+        className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-fg outline-none focus:border-fg" />
     </label>
   );
 
@@ -156,8 +156,8 @@ export default function BillboardPage() {
 
   return (
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[340px_1fr]">
-      <aside className="flex flex-col gap-4 rounded-2xl border border-line bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <h1 className="font-display text-4xl uppercase">Billboard</h1>
+      <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
+        <h1 className="font-display text-4xl">Billboard</h1>
         <Step n={1} title="Hero image"><SourcePicker value={source} onChange={setSource} /></Step>
         <Step n={2} title="Copy">
           <div className="space-y-2">{field("headline", "Headline", 48)}{field("sub", "Supporting line", 90)}{field("cta", "Button", 24)}</div>
@@ -165,10 +165,10 @@ export default function BillboardPage() {
         <Step n={3} title="Layout">
           <div className="space-y-2">{seg("Format", Object.keys(FORMATS) as Format[], format, setFormat)}{seg("Style", LAYOUTS, layout, setLayout)}</div>
         </Step>
-        <button onClick={save} disabled={!img} className="btn-ember rounded-xl py-3 font-semibold disabled:opacity-40">Save &amp; download PNG</button>
+        <button onClick={save} disabled={!img} className="btn-ember rounded-full py-3 font-semibold disabled:opacity-40">Save &amp; download PNG</button>
         <p aria-live="polite" className="text-sm text-ember-2">{saved}</p>
       </aside>
-      <section className="flex min-h-[420px] items-center justify-center rounded-2xl border border-line bg-panel p-4">
+      <section className="flex min-h-[420px] items-center justify-center rounded-3xl bg-panel p-4">
         {img ? <canvas ref={ref} className="max-h-[75vh] max-w-full rounded-xl shadow-2xl" aria-label="Ad preview" />
           : <div className="flex flex-col items-center gap-3 text-center"><img src={icon3d("megaphone")} alt="" className="h-16 w-16" /><p className="text-muted">Pick a hero image to start your ad.</p></div>}
       </section>

@@ -72,8 +72,8 @@ export default function VideoPage() {
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[340px_1fr]">
       <p className="sr-only" aria-live="polite">{rendering ? "Rendering clip" : result ? "Clip ready" : ""}</p>
 
-      <aside className="flex flex-col gap-4 rounded-2xl border border-line bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <h1 className="font-display text-4xl uppercase">Video</h1>
+      <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
+        <h1 className="font-display text-4xl">Video</h1>
         <Step n={1} title="Source image">
           <SourcePicker value={source} onChange={(a) => { setSource(a); setResult(undefined); setError(undefined); }} />
         </Step>
@@ -99,7 +99,7 @@ export default function VideoPage() {
             <button onClick={() => abortRef.current?.abort()} className="mt-2 w-full rounded-xl bg-panel-2 py-2 text-sm">Cancel</button>
           </div>
         ) : (
-          <button onClick={render} disabled={!img || !recordable} className="btn-ember rounded-xl py-3 font-semibold disabled:opacity-40">
+          <button onClick={render} disabled={!img || !recordable} className="btn-ember rounded-full py-3 font-semibold disabled:opacity-40">
             Render clip
           </button>
         )}
@@ -111,7 +111,7 @@ export default function VideoPage() {
       </aside>
 
       <section className="flex flex-col gap-6">
-        <div className="flex items-center justify-center rounded-2xl border border-line bg-panel p-4" style={{ minHeight: 360 }}>
+        <div className="flex items-center justify-center rounded-3xl bg-panel p-4" style={{ minHeight: 360 }}>
           {result ? (
             <ClipPlayer asset={result} large />
           ) : img ? (
@@ -139,7 +139,7 @@ export default function VideoPage() {
         <div role="dialog" aria-modal="true" aria-label="Camera moves" className="fixed inset-0 z-40 overflow-y-auto bg-bg/95 p-4 backdrop-blur" onClick={() => setCatalogOpen(false)}>
           <div className="mx-auto max-w-5xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-3xl uppercase">Camera moves</h2>
+              <h2 className="font-display text-3xl">Camera moves</h2>
               <button onClick={() => setCatalogOpen(false)} aria-label="Close" className="rounded-full bg-panel-2 px-3 py-1.5 text-sm">Close · Esc</button>
             </div>
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -148,11 +148,11 @@ export default function VideoPage() {
                   <button
                     autoFocus={p.id === preset.id}
                     onClick={() => { setPreset(p); setResult(undefined); setCatalogOpen(false); }}
-                    className={`w-full overflow-hidden rounded-2xl border text-left ${p.id === preset.id ? "border-ember" : "border-line hover:border-muted"}`}
+                    className={`w-full overflow-hidden rounded-2xl border text-left ${p.id === preset.id ? "border-fg" : "border-line hover:border-muted"}`}
                   >
                     <PresetTile img={img} preset={p} />
                     <span className="block bg-panel px-3 py-2">
-                      <span className="block font-display text-lg uppercase">{p.name}</span>
+                      <span className="block font-display text-lg">{p.name}</span>
                       <span className="text-xs text-muted">{p.hint}</span>
                     </span>
                   </button>

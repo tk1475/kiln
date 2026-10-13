@@ -47,3 +47,18 @@
 - Split modal: LEFT auto-advancing showcase carousel w/ segmented progress bar (Seedance 4K → Nano Banana Pro 4K "best image model, for the best price in the industry" → Higgsfield Soul → Cinematic App), each w/ "4K Resolution" chip, big uppercase title.
 - RIGHT: logo, "Welcome to Higgsfield / Sign up and generate for free"; highlighted CTA "Sign up with work email & Get 50 credits" (gift icon); Continue with Google / Apple / Microsoft; OR; "Work email" input (name@company.com) + Continue. Close X.
 - Observed free incentive: 50 credits for work-email sign-up (other paths' free credits UNVERIFIED).
+
+## Sign-in (user performed, 2026-10-13)
+- Google OAuth → /auth/sso-callback (keeps return path `rp=/pricing`) → Cloudflare "Verify you are human" Turnstile on callback (user solved) → returned to /pricing.
+- Same split showcase carousel shown on the callback page.
+
+## Authenticated — fresh account
+- Nav changes: adds search icon, "Assets" button, avatar (no dropdown — click goes straight to public profile `/@<handle>`). "AI Influencer" badge changes New → Free.
+- Pricing (authed): "PERSONAL 50% OFF" hero with live countdown (~3h, hours/min/sec tiles); top bar "Discount expires in 02h 56m 23s"; new trial row "Try Higgsfield free for 3 days — 150 credits + Seedance free generations — $0 now, then $49/mo to Plus plan — Get FREE trial for $0" + "How the trial works & how to cancel". Discounts rise to 31%/37%.
+- Profile (private screenshot): auto-generated handle, avatar w/ "◆ 0" badge (likely credits or level — UNVERIFIED), followers/following/views/likes, Edit profile, "Tell about you", location, achievements; tabs All works / Projects / Shots / Blog / Achievements; Publish + Create buttons; skeleton cards while loading.
+- Assets (/assets?): left nav Assets / Projects / Favourites / Elements (counts) + Tools: Images / Video / Audio / Enhanced; empty state "Nothing here yet — All your assets in one place — generations, projects, and more. Reuse them to keep your generations consistent" w/ 3-card illustration (Organize / Reuse Elements / Generate) + "Start generating"; feature tooltip "Now you can search by date and prompt". Logged-out generation from earlier did NOT appear (0 assets).
+- Image (authed): identical composer; remembers last settings (Mid quality persisted); dismissible toast "Don't know where to start? Go to the Academy — Learn now"; filter icon + size slider top-right (gallery controls). No credit balance visible anywhere on the generator.
+- Video presets (authed): Seedance 2.5 tab still only "GENERAL".
+- Effects (/effects/use): preset-first generator. Left: preset card ("FLOATING FALL", Change — tooltip "Change preset [P]" keyboard shortcut); input slots Character (required), Location (optional), Products (optional) — "Select a PNG or JPG"; hidden "Toggle prompt"; Resolution 720p; Aspect 9:16; "Try in ChatGPT"; Generate 84 credits. Right: History | How it works; animated tutorial carousel ("Upload image").
+- Effects catalog (Change): full-width masonry grid of autoplaying preset video cards, uppercase label bottom-left, lime border + check on selected, Search, Effects | History toggle. Visible: Monster Dab, Street Colossus, Smash and Grab, Incline, Selfception, Infinite Clones, Act Natural, Clones, Wild Ride, Lidar Transition, Floating Fall, Eyes In, Vanish, Cutout.
+- NOT DONE: no paid/credit generation run while authed (user did not approve spending); results view, download/regenerate/edit actions, error states, out-of-credits flow unobserved.

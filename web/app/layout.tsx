@@ -7,7 +7,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Kiln — image & motion studio",
+  title: "Kiln — image, video & audio studio",
   description: "Generate images with open models and turn them into motion clips.",
 };
 

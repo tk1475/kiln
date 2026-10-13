@@ -97,7 +97,7 @@ export default function ImagePage() {
       {configured === false && (
         <div role="status" className="mt-4 rounded-xl border border-line bg-panel px-4 py-3 text-sm text-muted">
           Image generation isn&apos;t configured on this deployment yet (missing model credentials). You can still use{" "}
-          <Link href="/motion" className="text-ember underline">Motion</Link> with your own images.
+          <Link href="/video" className="text-ember underline">Video</Link> with your own images.
         </div>
       )}
 
@@ -216,7 +216,7 @@ function ResultCard({ asset, onRemix, onDelete }: { asset: Asset; onRemix: () =>
       <figcaption className="space-y-2 p-3">
         <p className="line-clamp-2 text-xs text-muted">{asset.prompt}</p>
         <div className="flex flex-wrap gap-1.5 text-xs">
-          <Link href={`/motion?src=${asset.id}`} className="btn-ember rounded-full px-3 py-1 font-medium">Animate</Link>
+          <Link href={`/video?src=${asset.id}`} className="btn-ember rounded-full px-3 py-1 font-medium">Animate</Link>
           <button onClick={() => downloadBlob(asset.blob, `kiln-${asset.id.slice(0, 8)}.jpg`)} className="rounded-full bg-panel-2 px-3 py-1">Download</button>
           <button onClick={onRemix} className="rounded-full bg-panel-2 px-3 py-1">Remix</button>
           <button

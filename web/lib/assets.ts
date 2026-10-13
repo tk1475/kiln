@@ -1,10 +1,10 @@
 import { createStore, del, get, keys, set } from "idb-keyval";
 
-export type AssetLabel = "ai-generated" | "local-render" | "user-upload";
+export type AssetLabel = "ai-generated" | "local-render" | "local-synth" | "user-upload";
 
 export interface Asset {
   id: string;
-  kind: "image" | "motion";
+  kind: "image" | "motion" | "audio";
   label: AssetLabel;
   createdAt: number;
   blob: Blob;
@@ -44,6 +44,7 @@ export async function listAssets(kind?: Asset["kind"]): Promise<Asset[]> {
 export const LABEL_TEXT: Record<AssetLabel, string> = {
   "ai-generated": "AI · FLUX.1 schnell",
   "local-render": "Local motion render",
+  "local-synth": "Local synth render",
   "user-upload": "Your upload",
 };
 

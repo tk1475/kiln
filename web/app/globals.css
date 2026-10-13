@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0f0d0c;
+  --panel: #1a1715;
+  --panel-2: #24201d;
+  --line: #342e2a;
+  --fg: #f3ede7;
+  --muted: #a39890;
+  --ember: #ff6a3d;
+  --ember-2: #ffb547;
+  --danger: #ff5a6e;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-ember: var(--ember);
+  --color-ember-2: var(--ember-2);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+}
+
+.btn-ember {
+  background: linear-gradient(135deg, var(--ember), var(--ember-2));
+  color: #1a0d06;
+}
+
+/* Staged loading: grain shimmer → warm gradient */
+@keyframes kiln-shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.kiln-loading {
+  background: linear-gradient(110deg, #1f1b18 20%, #3a2a20 40%, #5a3322 50%, #3a2a20 60%, #1f1b18 80%);
+  background-size: 200% 100%;
+  animation: kiln-shimmer 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiln-loading { animation: none; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

@@ -7,7 +7,6 @@ import ThemeToggle from "@/components/ThemeToggle";
 type Item = { href: string; label: string; badge?: string };
 
 const CORE: Item[] = [
-  { href: "/explore", label: "Explore" },
   { href: "/image", label: "Image" },
   { href: "/video", label: "Video" },
   { href: "/audio", label: "Audio" },
@@ -42,9 +41,9 @@ function NavLink({ item, path }: { item: Item; path: string }) {
 export default function Nav() {
   const path = usePathname();
   return (
-    <header className="sticky top-0 z-30 bg-bg/85 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-white/10 bg-bg/55 backdrop-blur-xl backdrop-saturate-150">
       <nav className="mx-auto flex h-16 max-w-7xl items-center gap-2 overflow-x-auto px-4" aria-label="Primary">
-        <Link href="/explore" className="mr-4 flex shrink-0 items-center gap-2 text-lg font-medium tracking-tight">
+        <Link href="/" className="mr-4 flex shrink-0 items-center gap-2 text-lg font-medium tracking-tight">
           <img src="/brand/kiln-mark.png" alt="" width={24} height={24} className="brand-mark h-6 w-6" />
           Kiln
         </Link>

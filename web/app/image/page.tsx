@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Asset, LABEL_TEXT, deleteAsset, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { ASPECTS, AspectId, cropToAspect } from "@/lib/image";
+import PromptDock from "@/components/PromptDock";
 import { useObjectUrl } from "@/components/useObjectUrl";
 import { SAMPLES, TOOL_ICONS, icon3d, libraryUrl } from "@/lib/library";
 
@@ -88,6 +89,29 @@ export default function ImagePage() {
     inputRef.current?.focus();
   };
 
+  // Hand-off from the Home prompt box: /image?prompt=…&aspect=…&count=…&go=1
+  const handoff = useRef<string | null>(null);
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    const p = q.get("prompt");
+    if (!p) return;
+    history.replaceState(null, "", "/image");
+    queueMicrotask(() => {
+      setPrompt(p);
+      const a = ASPECTS.find((x) => x.id === q.get("aspect"));
+      if (a) setAspect(a.id);
+      const n = Number(q.get("count"));
+      if (n >= 1 && n <= 4) setCount(n);
+      if (q.get("go") === "1") handoff.current = p;
+    });
+  }, []);
+  useEffect(() => {
+    if (configured && handoff.current && prompt === handoff.current) {
+      handoff.current = null;
+      generate();
+    }
+  });
+
   const empty = jobs.length === 0 && assets.length === 0;
   const canGenerate = configured === true && prompt.trim().length > 0;
 
@@ -156,53 +180,11 @@ export default function ImagePage() {
         </section>
       )}
 
-      <form
-        onSubmit={(e) => { e.preventDefault(); generate(); }}
-        className="fixed inset-x-0 bottom-4 z-20 mx-auto w-[calc(100%-2rem)] max-w-3xl rounded-3xl bg-panel/95 p-3 shadow-2xl ring-1 ring-transparent backdrop-blur transition-shadow focus-within:ring-ember/50"
-      >
-        <label htmlFor="prompt" className="sr-only">Prompt</label>
-        <textarea
-          id="prompt"
-          ref={inputRef}
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); generate(); } }}
-          rows={2}
-          maxLength={1000}
-          placeholder="Describe the scene you want to fire up…"
-          className="w-full resize-none bg-transparent px-2 py-1 text-base outline-none placeholder:text-muted/70"
-        />
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <div role="radiogroup" aria-label="Aspect ratio" className="flex rounded-full bg-panel-2 p-1">
-            {ASPECTS.map((a) => (
-              <button
-                key={a.id}
-                type="button"
-                role="radio"
-                aria-checked={aspect === a.id}
-                onClick={() => setAspect(a.id)}
-                className={`rounded-full px-2.5 py-1 text-xs tabular-nums ${aspect === a.id ? "bg-fg text-bg" : "text-muted hover:text-fg"}`}
-              >
-                {a.id}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center rounded-full bg-panel-2 px-1" aria-label="Number of images">
-            <button type="button" aria-label="Fewer images" disabled={count <= 1} onClick={() => setCount((c) => c - 1)} className="px-2 py-1 text-muted disabled:opacity-30">−</button>
-            <span className="w-8 text-center text-xs tabular-nums" aria-live="polite">{count}/4</span>
-            <button type="button" aria-label="More images" disabled={count >= 4} onClick={() => setCount((c) => c + 1)} className="px-2 py-1 text-muted disabled:opacity-30">+</button>
-          </div>
-          <span className="hidden text-xs text-muted sm:inline">FLUX.1 schnell · free tier</span>
-          <button
-            type="submit"
-            disabled={!canGenerate}
-            title={configured === false ? "Generation isn't configured" : undefined}
-            className="btn-ember ml-auto rounded-full px-5 py-2.5 text-sm font-semibold transition-opacity disabled:opacity-40"
-          >
-            Generate <span className="ml-1 hidden text-xs font-normal opacity-70 sm:inline">⌘↵</span>
-          </button>
-        </div>
-      </form>
+      <PromptDock
+        prompt={prompt} setPrompt={setPrompt} aspect={aspect} setAspect={setAspect} count={count} setCount={setCount}
+        onSubmit={generate} canSubmit={canGenerate} inputRef={inputRef}
+        disabledReason={configured === false ? "Generation isn't configured" : undefined}
+      />
     </div>
   );
 }

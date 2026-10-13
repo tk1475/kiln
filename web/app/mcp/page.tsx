@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { icon3d } from "@/lib/library";
 
 export const metadata: Metadata = { title: "MCP — Kiln" };
 
 export default function McpPage() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10">
+      <img src={icon3d("puzzle")} alt="" className="mb-4 h-14 w-14" />
       <span className="rounded-md bg-panel-2 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-muted">Planned · not available yet</span>
       <h1 className="mt-4 font-display text-5xl uppercase">Kiln for AI assistants</h1>
       <p className="mt-3 text-muted">

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Asset, downloadBlob, saveAsset } from "@/lib/assets";
 import { loadImage } from "@/lib/image";
 import SourcePicker, { Step } from "@/components/SourcePicker";
+import { icon3d } from "@/lib/library";
 
 const FORMATS = { Square: [1080, 1080], Story: [1080, 1920], Landscape: [1920, 1080] } as const;
 type Format = keyof typeof FORMATS;
@@ -169,7 +170,7 @@ export default function BillboardPage() {
       </aside>
       <section className="flex min-h-[420px] items-center justify-center rounded-2xl border border-line bg-panel p-4">
         {img ? <canvas ref={ref} className="max-h-[75vh] max-w-full rounded-xl shadow-2xl" aria-label="Ad preview" />
-          : <p className="text-muted">Pick a hero image to start your ad.</p>}
+          : <div className="flex flex-col items-center gap-3 text-center"><img src={icon3d("megaphone")} alt="" className="h-16 w-16" /><p className="text-muted">Pick a hero image to start your ad.</p></div>}
       </section>
     </div>
   );

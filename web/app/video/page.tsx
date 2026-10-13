@@ -1,26 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { Asset, LABEL_TEXT, downloadBlob, getAsset, listAssets, saveAsset } from "@/lib/assets";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Asset, LABEL_TEXT, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { loadImage } from "@/lib/image";
 import { MotionAspect, OUTPUT_SIZES, PRESETS, Preset, canRecord, drawFrame, renderMotion } from "@/lib/motion";
 import { useObjectUrl } from "@/components/useObjectUrl";
+import SourcePicker, { Step } from "@/components/SourcePicker";
+import { SAMPLES, icon3d, libraryUrl } from "@/lib/library";
 
 const DURATIONS = [3, 5, 8];
 
-export default function MotionPage() {
-  return (
-    <Suspense>
-      <Motion />
-    </Suspense>
-  );
-}
-
-function Motion() {
-  const params = useSearchParams();
-  const [images, setImages] = useState<Asset[]>([]);
+export default function VideoPage() {
   const [clips, setClips] = useState<Asset[]>([]);
   const [source, setSource] = useState<Asset>();
   const [img, setImg] = useState<HTMLImageElement>();
@@ -32,14 +22,10 @@ function Motion() {
   const [result, setResult] = useState<Asset>();
   const [catalogOpen, setCatalogOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    listAssets("image").then(setImages);
     listAssets("motion").then(setClips);
-    const id = params.get("src");
-    if (id) getAsset(id).then((a) => a && setSource(a));
-  }, [params]);
+  }, []);
 
   useEffect(() => {
     if (!source) return;
@@ -57,24 +43,6 @@ function Motion() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  const addFile = async (file?: File | null) => {
-    if (!file || !file.type.startsWith("image/")) { setError("Choose a PNG, JPG or WebP image."); return; }
-    setError(undefined);
-    const i = await loadImage(file);
-    const a: Asset = { id: crypto.randomUUID(), kind: "image", label: "user-upload", createdAt: Date.now(), blob: file, width: i.naturalWidth, height: i.naturalHeight };
-    URL.revokeObjectURL(i.src);
-    await saveAsset(a);
-    setImages((x) => [a, ...x]);
-    setSource(a);
-    setResult(undefined);
-  };
-
-  useEffect(() => {
-    const onPaste = (e: ClipboardEvent) => addFile(e.clipboardData?.files?.[0]);
-    window.addEventListener("paste", onPaste);
-    return () => window.removeEventListener("paste", onPaste);
-  });
 
   const render = async () => {
     if (!img || !source) return;
@@ -105,23 +73,10 @@ function Motion() {
       <p className="sr-only" aria-live="polite">{rendering ? "Rendering clip" : result ? "Clip ready" : ""}</p>
 
       <aside className="flex flex-col gap-4 rounded-2xl border border-line bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <section>
-          <h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">1 · Source image</h2>
-          <div
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => { e.preventDefault(); addFile(e.dataTransfer.files[0]); }}
-            className="rounded-xl border border-dashed border-line p-2"
-          >
-            {images.length > 0 && (
-              <ul className="mb-2 grid max-h-44 grid-cols-4 gap-1.5 overflow-y-auto" aria-label="Your images">
-                {images.map((a) => <Thumb key={a.id} asset={a} active={source?.id === a.id} onPick={() => { setSource(a); setResult(undefined); }} />)}
-              </ul>
-            )}
-            <button onClick={() => fileRef.current?.click()} className="w-full rounded-lg bg-panel-2 py-2 text-sm">Upload image</button>
-            <p className="mt-1.5 text-center text-[11px] text-muted">or drop / paste · <Link href="/image" className="underline">generate one</Link></p>
-            <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => addFile(e.target.files?.[0])} />
-          </div>
-        </section>
+        <h1 className="font-display text-4xl uppercase">Video</h1>
+        <Step n={1} title="Source image">
+          <SourcePicker value={source} onChange={(a) => { setSource(a); setResult(undefined); setError(undefined); }} />
+        </Step>
 
         <section>
           <h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">2 · Camera move</h2>
@@ -162,7 +117,8 @@ function Motion() {
           ) : img ? (
             <LivePreview img={img} preset={preset} aspect={aspect} duration={duration} />
           ) : (
-            <div className="max-w-xs text-center">
+            <div className="flex max-w-xs flex-col items-center text-center">
+              <img src={icon3d("clapper")} alt="" className="mb-3 h-16 w-16" />
               <p className="text-lg font-medium">Pick an image to animate</p>
               <p className="mt-1 text-sm text-muted">Choose one of your generations, upload a photo, or paste from your clipboard.</p>
             </div>
@@ -226,19 +182,6 @@ function Seg<T extends string | number>({ label, options, value, onChange, fmt =
   );
 }
 
-function Thumb({ asset, active, onPick }: { asset: Asset; active: boolean; onPick: () => void }) {
-  const url = useObjectUrl(asset.blob);
-  return (
-    <li>
-      <button onClick={onPick} aria-pressed={active} aria-label={asset.prompt ?? LABEL_TEXT[asset.label]}
-        className={`block aspect-square w-full overflow-hidden rounded-lg border-2 ${active ? "border-ember" : "border-transparent"}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        {url && <img src={url} alt="" className="h-full w-full object-cover" />}
-      </button>
-    </li>
-  );
-}
-
 function useLoop(draw: (t: number) => void, periodMs: number) {
   useEffect(() => {
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -269,15 +212,35 @@ function LivePreview({ img, preset, aspect, duration }: { img: HTMLImageElement;
 
 function PresetTile({ img, preset }: { img?: HTMLImageElement; preset: Preset }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const sample = useSamplePhoto();
   const draw = useCallback((t: number) => {
     const ctx = ref.current?.getContext("2d");
-    if (ctx) drawFrame(ctx, img ?? fallbackImage(), preset, t);
-  }, [img, preset]);
+    if (ctx) drawFrame(ctx, img ?? sample ?? fallbackImage(), preset, t);
+  }, [img, sample, preset]);
   useLoop(draw, 2500);
   return <canvas ref={ref} width={320} height={240} className="block aspect-[4/3] w-full bg-black" aria-hidden />;
 }
 
-/** Abstract test card used for preset previews when no image is selected. */
+/** A library photo for preset previews when no image is picked (cross-origin safe: CDN sends CORS). */
+let samplePhoto: Promise<HTMLImageElement> | undefined;
+function useSamplePhoto() {
+  const [img, setImg] = useState<HTMLImageElement>();
+  useEffect(() => {
+    samplePhoto ??= new Promise((resolve, reject) => {
+      const i = new Image();
+      i.crossOrigin = "anonymous";
+      i.onload = () => resolve(i);
+      i.onerror = reject;
+      i.src = libraryUrl(SAMPLES[0]);
+    });
+    let alive = true;
+    samplePhoto.then((i) => alive && setImg(i)).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return img;
+}
+
+/** Abstract test card used while the sample photo loads. */
 let fallback: HTMLCanvasElement | undefined;
 function fallbackImage() {
   if (fallback) return fallback;

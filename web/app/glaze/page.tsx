@@ -5,6 +5,7 @@ import { Asset, downloadBlob, saveAsset } from "@/lib/assets";
 import { GLAZES, Glaze } from "@/lib/glaze";
 import { loadImage } from "@/lib/image";
 import SourcePicker, { Step } from "@/components/SourcePicker";
+import { icon3d } from "@/lib/library";
 
 const MAX = 2048;
 
@@ -62,7 +63,7 @@ export default function GlazePage() {
       <section className="flex flex-col gap-4">
         <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-line bg-panel p-4">
           {img ? <canvas ref={preview} className="max-h-[60vh] max-w-full rounded-xl" aria-label={`Preview with ${glaze.name}`} />
-            : <p className="text-muted">Pick an image to glaze.</p>}
+            : <div className="flex flex-col items-center gap-3 text-center"><img src={icon3d("paintbrush")} alt="" className="h-16 w-16" /><p className="text-muted">Pick an image to glaze.</p></div>}
         </div>
         <div role="radiogroup" aria-label="Effect" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {GLAZES.map((g) => (

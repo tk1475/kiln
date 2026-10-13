@@ -8,6 +8,7 @@ import { MotionAspect, OUTPUT_SIZES } from "@/lib/motion";
 import { renderSplice, totalSeconds } from "@/lib/splice";
 import { Step } from "@/components/SourcePicker";
 import { useObjectUrl } from "@/components/useObjectUrl";
+import { icon3d } from "@/lib/library";
 
 export default function SplicePage() {
   const [library, setLibrary] = useState<Asset[]>([]);
@@ -128,7 +129,7 @@ export default function SplicePage() {
       </aside>
 
       <section className="flex min-h-[420px] items-center justify-center rounded-2xl border border-line bg-panel p-4">
-        {result ? <Result asset={result} /> : <p className="max-w-xs text-center text-muted">Build a timeline of stills and clips, add a soundtrack, and render one shareable edit.</p>}
+        {result ? <Result asset={result} /> : <div className="flex flex-col items-center gap-3 text-center"><img src={icon3d("filmreel")} alt="" className="h-16 w-16" /><p className="max-w-xs text-center text-muted">Build a timeline of stills and clips, add a soundtrack, and render one shareable edit.</p></div>}
       </section>
     </div>
   );
@@ -138,7 +139,6 @@ function Media({ asset }: { asset: Asset }) {
   const url = useObjectUrl(asset.blob);
   if (!url) return null;
   return asset.kind === "image"
-    // eslint-disable-next-line @next/next/no-img-element
     ? <img src={url} alt="" className="h-full w-full object-cover" />
     : <video src={`${url}#t=0.1`} muted preload="metadata" className="h-full w-full object-cover" />;
 }

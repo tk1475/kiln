@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Asset, LABEL_TEXT, deleteAsset, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { ASPECTS, AspectId, cropToAspect } from "@/lib/image";
 import { useObjectUrl } from "@/components/useObjectUrl";
+import { SAMPLES, libraryUrl } from "@/lib/library";
 
 type Job = { id: string; prompt: string; aspect: AspectId; status: "running" | "error"; error?: string };
 
@@ -103,6 +104,12 @@ export default function ImagePage() {
 
       {empty ? (
         <section className="flex flex-1 flex-col items-center justify-center py-16 text-center">
+          <div aria-hidden className="mb-8 flex items-end justify-center">
+            {SAMPLES.slice(0, 5).map((n, i) => (
+              <img key={n} src={libraryUrl(n)} alt="" className="-mx-3 h-28 w-20 rounded-xl border-2 border-panel object-cover shadow-2xl sm:h-36 sm:w-28"
+                style={{ transform: `rotate(${(i - 2) * 7}deg) translateY(${Math.abs(i - 2) * 10}px)`, zIndex: 5 - Math.abs(i - 2) }} />
+            ))}
+          </div>
           <h1 className="font-display text-5xl uppercase sm:text-6xl">
             Fire up an <span className="bg-gradient-to-r from-ember to-ember-2 bg-clip-text text-transparent">image</span>
           </h1>
@@ -206,7 +213,6 @@ function ResultCard({ asset, onRemix, onDelete }: { asset: Asset; onRemix: () =>
     <figure className="group mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-line bg-panel">
       <div className="relative" style={{ aspectRatio: `${asset.width} / ${asset.height}` }}>
         {url && (
-          // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt={asset.prompt ?? "Generated image"} className="h-full w-full object-cover" />
         )}
         <span className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[11px] text-fg/90">

@@ -1,6 +1,6 @@
 import { createStore, del, get, keys, set } from "idb-keyval";
 
-export type AssetLabel = "ai-generated" | "local-render" | "local-synth" | "local-edit" | "user-upload";
+export type AssetLabel = "ai-generated" | "local-render" | "local-synth" | "local-edit" | "user-upload" | "sample";
 
 export interface Asset {
   id: string;
@@ -47,6 +47,7 @@ export const LABEL_TEXT: Record<AssetLabel, string> = {
   "local-synth": "Local synth render",
   "local-edit": "Local edit",
   "user-upload": "Your upload",
+  "sample": "Sample library",
 };
 
 export function downloadBlob(blob: Blob, name: string) {

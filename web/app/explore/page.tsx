@@ -18,6 +18,8 @@ const TOOLS = [
   { key: "splice", href: "/splice", name: "Splice", line: "Cut shots and sound into one edit", badge: "Top" },
 ];
 
+const HERO_CLIP = CLIPS.find((c) => c.id === "a-7")!;
+
 const BUILT_ON = ["FLUX.1 schnell", "Cloudflare Workers AI", "Web Audio", "Canvas 2D", "MediaRecorder", "IndexedDB", "Next.js"];
 
 const ACTIONS = [
@@ -30,14 +32,14 @@ function Pill({ href, children, dark }: { href: string; children: React.ReactNod
   return (
     <Link href={href} className={`inline-flex items-center gap-3 rounded-full py-1.5 pl-5 pr-1.5 font-mono text-xs uppercase tracking-[0.12em] ${dark ? "bg-fg text-bg" : "btn-ember"}`}>
       {children}
-      <span className="arrow-dot" aria-hidden style={dark ? { background: "var(--ember)", color: "var(--fg)" } : undefined}>↗</span>
+      <span className="arrow-dot" aria-hidden style={dark ? { background: "var(--ember)", color: "var(--on-ember)" } : undefined}>↗</span>
     </Link>
   );
 }
 
-function Bubble({ icon, tone }: { icon: string; tone: "lime" | "sky" }) {
+function Bubble({ icon, tone }: { icon: string; tone: "accent" | "sky" }) {
   return (
-    <span aria-hidden className={`mx-1 inline-grid h-[0.95em] w-[0.95em] translate-y-[0.08em] place-items-center rounded-full align-baseline ${tone === "lime" ? "bg-ember" : "bg-sky-400"}`}>
+    <span aria-hidden className={`mx-1 inline-grid h-[0.95em] w-[0.95em] translate-y-[0.08em] place-items-center rounded-full align-baseline ${tone === "accent" ? "bg-ember" : "bg-sky-400"}`}>
       <img src={icon3d(icon)} alt="" className="h-[0.7em] w-[0.7em]" />
     </span>
   );
@@ -52,7 +54,7 @@ export default function ExplorePage() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-16">
       <section className="relative overflow-hidden rounded-[28px]">
-        <HeroVideo clip={CLIPS[0]} />
+        <HeroVideo clip={HERO_CLIP} />
         <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-transparent" />
         <div className="relative px-6 pb-56 pt-16 text-white sm:px-10 sm:pb-64 sm:pt-24">
           <h1 className="font-display max-w-2xl text-5xl sm:text-7xl">
@@ -66,25 +68,25 @@ export default function ExplorePage() {
         </div>
 
         <ul className="absolute inset-x-0 bottom-5 flex gap-3 overflow-x-auto px-5 sm:px-8" aria-label="Highlights">
-          <li className="w-56 shrink-0 rounded-2xl bg-white/90 p-3 backdrop-blur">
+          <li className="w-56 shrink-0 rounded-2xl bg-bg/90 p-3 backdrop-blur">
             <div className="flex flex-wrap gap-1.5">
-              {PRESETS.slice(0, 6).map((p) => <span key={p.id} className="rounded-full bg-white px-2.5 py-1 text-xs shadow-sm">{p.name}</span>)}
+              {PRESETS.slice(0, 6).map((p) => <span key={p.id} className="rounded-full bg-bg px-2.5 py-1 text-xs shadow-sm">{p.name}</span>)}
             </div>
             <p className="mt-3 text-xs text-muted">Camera moves</p>
             <p className="font-display text-3xl">{PRESETS.length}</p>
           </li>
           <li className="relative h-40 w-44 shrink-0 overflow-hidden rounded-2xl">
             <img src={libraryUrl(SAMPLES[2])} alt="" className="h-full w-full object-cover" />
-            <span className="absolute inset-x-2 bottom-2 rounded-xl bg-white/90 px-2.5 py-1.5 text-xs">
+            <span className="absolute inset-x-2 bottom-2 rounded-xl bg-bg/90 px-2.5 py-1.5 text-xs">
               <span className="block text-muted">Video</span>Push In · 5s
             </span>
           </li>
-          <li className="flex w-56 shrink-0 flex-col justify-center rounded-2xl bg-fg p-4 text-bg">
+          <li className="flex w-56 shrink-0 flex-col justify-center rounded-2xl bg-[#101114] p-4 text-white">
             <p className="text-lg leading-snug">
               Images <span className="inline-block h-2.5 w-2.5 rounded-full bg-ember" aria-hidden /> <span className="text-white/50">motion and sound in one studio</span>
             </p>
           </li>
-          <li className="w-60 shrink-0 rounded-2xl bg-white p-3">
+          <li className="w-60 shrink-0 rounded-2xl bg-bg p-3">
             <p className="text-xs text-muted">Glaze looks</p>
             <ul className="mt-2 space-y-1.5">
               {GLAZES.slice(0, 3).map((g) => (
@@ -100,7 +102,7 @@ export default function ExplorePage() {
       <section className="mt-24 grid gap-8 lg:grid-cols-[1fr_2fr]">
         <p className="eyebrow pt-3">The studio</p>
         <h2 className="font-display text-4xl sm:text-5xl">
-          One prompt becomes an <Bubble icon="easel" tone="sky" /> image, a <Bubble icon="clapper" tone="lime" /> shot
+          One prompt becomes an <Bubble icon="easel" tone="sky" /> image, a <Bubble icon="clapper" tone="accent" /> shot
           <span className="text-muted"> and a scored edit you can post.</span>
         </h2>
       </section>
@@ -124,7 +126,7 @@ export default function ExplorePage() {
         <div className="flex min-h-56 flex-col justify-between overflow-hidden rounded-3xl bg-panel p-5">
           <div className="-mx-5 overflow-hidden">
             <div className="marquee flex w-max gap-1.5 px-5">
-              {[...PRESETS, ...PRESETS].map((p, i) => <span key={i} className="shrink-0 rounded-full bg-white px-3 py-1 text-xs">{p.name}</span>)}
+              {[...PRESETS, ...PRESETS].map((p, i) => <span key={i} className="shrink-0 rounded-full bg-bg px-3 py-1 text-xs">{p.name}</span>)}
             </div>
           </div>
           <div><p className="text-sm text-muted">Camera moves</p><p className="font-display text-5xl">{PRESETS.length}</p></div>
@@ -163,7 +165,7 @@ export default function ExplorePage() {
                 <img src={icon3d(TOOL_ICONS[t.key])} alt="" className="h-14 w-14 transition-transform group-hover:-translate-y-1 group-hover:rotate-[-6deg]" />
                 <p className="mt-8 flex items-center gap-2 text-xl font-medium tracking-tight">
                   {t.name}
-                  {t.badge && <span className={t.badge === "Top" ? "badge !bg-white" : "badge"}>{t.badge}</span>}
+                  {t.badge && <span className={t.badge === "Top" ? "badge !bg-panel-2 !text-fg" : "badge"}>{t.badge}</span>}
                 </p>
                 <p className="text-sm text-muted">{t.line}</p>
               </Link>
@@ -190,7 +192,7 @@ export default function ExplorePage() {
               <Image src={libraryUrl(n)} alt="Sample image" width={600} height={800} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" className="h-auto w-full" />
               <div className="absolute inset-x-0 bottom-0 flex gap-1.5 bg-gradient-to-t from-black/60 to-transparent p-3 pt-10 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
                 {ACTIONS.map((a) => (
-                  <Link key={a.href} href={`${a.href}?sample=${n}`} className="rounded-full bg-white px-3 py-1 font-mono text-[11px] uppercase tracking-[0.1em] text-fg hover:bg-ember">{a.label}</Link>
+                  <Link key={a.href} href={`${a.href}?sample=${n}`} className="rounded-full bg-bg px-3 py-1 font-mono text-[11px] uppercase tracking-[0.1em] text-fg hover:bg-ember hover:text-on-ember">{a.label}</Link>
                 ))}
               </div>
             </li>
@@ -210,7 +212,7 @@ function RecentTile({ asset }: { asset: Asset }) {
         {url && (asset.kind === "motion"
           ? <video src={url} muted loop autoPlay playsInline className="h-full w-full object-cover" />
           : <img src={url} alt={asset.prompt ?? ""} className="h-full w-full object-cover" />)}
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px]">{LABEL_TEXT[asset.label]}</span>
+        <span className="absolute left-3 top-3 rounded-full bg-bg/90 px-2.5 py-0.5 text-[11px]">{LABEL_TEXT[asset.label]}</span>
       </Link>
     </li>
   );
@@ -232,8 +234,8 @@ function ClipTile({ clip }: { clip: SampleClip }) {
     <li className="group relative mb-4 break-inside-avoid overflow-hidden rounded-3xl bg-panel" onMouseEnter={play} onMouseLeave={stop}>
       <video ref={ref} src={clipUrl(clip)} poster={clipPoster(clip)} muted loop playsInline preload="none"
         width={clip.w} height={clip.h} className="block h-auto w-full" aria-label="Sample clip" />
-      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px]">Sample clip</span>
-      <span aria-hidden className="absolute bottom-3 right-3 grid h-9 w-9 place-items-center rounded-full bg-ember text-fg transition-opacity group-hover:opacity-0">▶</span>
+      <span className="absolute left-3 top-3 rounded-full bg-bg/90 px-2.5 py-0.5 text-[11px]">Sample clip</span>
+      <span aria-hidden className="absolute bottom-3 right-3 grid h-9 w-9 place-items-center rounded-full bg-ember text-on-ember transition-opacity group-hover:opacity-0">▶</span>
       <button onFocus={play} onBlur={stop} className="absolute inset-0" aria-label="Play sample clip preview" />
     </li>
   );

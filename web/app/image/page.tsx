@@ -135,7 +135,7 @@ export default function ImagePage() {
             <div key={j.id} className="mb-4 break-inside-avoid overflow-hidden rounded-3xl bg-panel">
               {j.status === "running" ? (
                 <div className="kiln-loading relative" style={{ aspectRatio: ratio(j.aspect) }}>
-                  <span className="absolute bottom-3 left-3 rounded-full bg-black/40 px-2 py-1 text-xs text-fg/80">Firing…</span>
+                  <span className="absolute bottom-3 left-3 rounded-full bg-black/40 px-2 py-1 text-xs text-white/85">Firing…</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-start gap-3 p-4" style={{ aspectRatio: ratio(j.aspect) }}>
@@ -157,7 +157,7 @@ export default function ImagePage() {
 
       <form
         onSubmit={(e) => { e.preventDefault(); generate(); }}
-        className="fixed inset-x-0 bottom-4 z-20 mx-auto w-[calc(100%-2rem)] max-w-3xl rounded-3xl bg-panel/95 p-3 shadow-2xl backdrop-blur"
+        className="fixed inset-x-0 bottom-4 z-20 mx-auto w-[calc(100%-2rem)] max-w-3xl rounded-3xl bg-panel/95 p-3 shadow-2xl ring-1 ring-transparent backdrop-blur transition-shadow focus-within:ring-ember/50"
       >
         <label htmlFor="prompt" className="sr-only">Prompt</label>
         <textarea
@@ -215,7 +215,7 @@ function ResultCard({ asset, onRemix, onDelete }: { asset: Asset; onRemix: () =>
         {url && (
           <img src={url} alt={asset.prompt ?? "Generated image"} className="h-full w-full object-cover" />
         )}
-        <span className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[11px] text-fg/90">
+        <span className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[11px] text-white/90">
           {LABEL_TEXT[asset.label]}
         </span>
       </div>

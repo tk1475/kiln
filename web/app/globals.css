@@ -1,17 +1,58 @@
 @import "tailwindcss";
 
-/* Kiln design system — light, soft-card, lime-accent.
-   ember = accent fill (lime), ember-2 = accent ink (readable on light). */
+/* Kiln design system — soft-card, blue accent matching the 3D icons, light and dark.
+   ember = accent fill, on-ember = text on it, ember-2 = accent ink. */
 :root {
+  color-scheme: light;
   --bg: #ffffff;
-  --panel: #f1f1ef;
-  --panel-2: #e7e7e3;
-  --line: #e4e4e0;
-  --fg: #111111;
-  --muted: #8a8a85;
-  --ember: #d7f45c;
-  --ember-2: #4d6b00;
+  --panel: #f1f2f4;
+  --panel-2: #e6e8ec;
+  --line: #e2e4e9;
+  --fg: #101114;
+  --muted: #868a93;
+  --ember: #2f6bff;
+  --on-ember: #ffffff;
+  --ember-2: #1f4fd6;
   --danger: #d93f3f;
+  --shimmer-a: #eceef1;
+  --shimmer-b: #f6f7f9;
+  --shimmer-c: #dfe8ff;
+  --mark-filter: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0b0c0e;
+    --panel: #15171b;
+    --panel-2: #1f2228;
+    --line: #262a31;
+    --fg: #f1f3f6;
+    --muted: #8a909b;
+    --ember: #4d84ff;
+    --ember-2: #8fb2ff;
+    --danger: #ff6b6b;
+    --shimmer-a: #16181c;
+    --shimmer-b: #1d2026;
+    --shimmer-c: #1c2a4d;
+    --mark-filter: invert(1);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b0c0e;
+  --panel: #15171b;
+  --panel-2: #1f2228;
+  --line: #262a31;
+  --fg: #f1f3f6;
+  --muted: #8a909b;
+  --ember: #4d84ff;
+  --ember-2: #8fb2ff;
+  --danger: #ff6b6b;
+  --shimmer-a: #16181c;
+  --shimmer-b: #1d2026;
+  --shimmer-c: #1c2a4d;
+  --mark-filter: invert(1);
 }
 
 @theme inline {
@@ -23,6 +64,7 @@
   --color-muted: var(--muted);
   --color-ember: var(--ember);
   --color-ember-2: var(--ember-2);
+  --color-on-ember: var(--on-ember);
   --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -35,8 +77,18 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--fg);
+  outline: 2px solid var(--ember);
   outline-offset: 2px;
+}
+/* Text fields show focus through their container or border, not a box outline. */
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
+
+.brand-mark {
+  filter: var(--mark-filter);
 }
 
 /* Display headlines: tight neo-grotesk */
@@ -59,10 +111,10 @@ body {
   margin-right: 0.6em;
 }
 
-/* Primary action: lime pill */
+/* Primary action: accent pill */
 .btn-ember {
   background: var(--ember);
-  color: var(--fg);
+  color: var(--on-ember);
   font-family: var(--font-geist-mono);
   font-size: 12px;
   letter-spacing: 0.12em;
@@ -70,7 +122,7 @@ body {
   transition: filter 0.15s;
 }
 .btn-ember:hover:not(:disabled) {
-  filter: brightness(0.96);
+  filter: brightness(1.08);
 }
 
 /* Dark circular arrow badge used inside pills */
@@ -80,7 +132,7 @@ body {
   width: 1.9em;
   height: 1.9em;
   border-radius: 999px;
-  background: var(--fg);
+  background: var(--on-ember);
   color: var(--ember);
 }
 
@@ -93,7 +145,7 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   background: var(--ember);
-  color: var(--fg);
+  color: var(--on-ember);
 }
 
 /* Staged loading shimmer */
@@ -102,7 +154,7 @@ body {
   100% { background-position: 200% 50%; }
 }
 .kiln-loading {
-  background: linear-gradient(110deg, #ececea 20%, #f6f6f4 40%, #eef7c9 50%, #f6f6f4 60%, #ececea 80%);
+  background: linear-gradient(110deg, var(--shimmer-a) 20%, var(--shimmer-b) 40%, var(--shimmer-c) 50%, var(--shimmer-b) 60%, var(--shimmer-a) 80%);
   background-size: 200% 100%;
   animation: kiln-shimmer 1.6s linear infinite;
 }

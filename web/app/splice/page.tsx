@@ -131,7 +131,7 @@ export default function SplicePage() {
 
         <Step n={3} title="Soundtrack">
           <select value={track?.id ?? ""} onChange={(e) => setTrack(tracks.find((t) => t.id === e.target.value))}
-            className="w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm" aria-label="Soundtrack">
+            className="w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm focus:border-ember" aria-label="Soundtrack">
             <option value="">None</option>
             {tracks.map((t) => <option key={t.id} value={t.id}>{MOODS.find((m) => m.id === t.presetId)?.name} · {t.durationS}s</option>)}
           </select>

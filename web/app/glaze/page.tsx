@@ -54,7 +54,7 @@ export default function GlazePage() {
         <ToolHeader tool="glaze" eyebrow="Studio" title="Glaze" line="Film, glitch and VHS looks." />
         <Step n={1} title="Image"><SourcePicker value={source} onChange={(a) => { setSource(a); setSaved(undefined); }} /></Step>
         <Step n={2} title="Intensity">
-          <input type="range" min={0} max={1} step={0.05} value={k} onChange={(e) => setK(Number(e.target.value))} className="w-full accent-[var(--fg)]" aria-label="Intensity" />
+          <input type="range" min={0} max={1} step={0.05} value={k} onChange={(e) => setK(Number(e.target.value))} className="w-full accent-[var(--ember)]" aria-label="Intensity" />
         </Step>
         <button onClick={exportFull} disabled={!img} className="btn-ember rounded-full py-3 font-semibold disabled:opacity-40">Save &amp; download</button>
         <p className="text-[11px] text-muted">Effects are applied on your device. No AI model is involved.</p>

@@ -85,11 +85,11 @@ function draw(ctx: CanvasRenderingContext2D, img: HTMLImageElement, layout: Layo
     ctx.font = `600 ${Math.round(ctaH * 0.42)}px system-ui, sans-serif`;
     const w = ctx.measureText(copy.cta).width + ctaH;
     const bx = align === "center" ? x - w / 2 : x;
-    ctx.fillStyle = "#d7f45c";
+    ctx.fillStyle = "#2f6bff";
     ctx.beginPath();
     ctx.roundRect(bx, y, w, ctaH, ctaH / 2);
     ctx.fill();
-    ctx.fillStyle = "#111111";
+    ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(copy.cta, bx + w / 2, y + ctaH / 2);
@@ -139,7 +139,7 @@ export default function BillboardPage() {
     <label className="block text-xs text-muted">
       {label}
       <input value={copy[k]} maxLength={max} onChange={(e) => setCopy((c) => ({ ...c, [k]: e.target.value }))}
-        className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-fg outline-none focus:border-fg" />
+        className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-fg outline-none focus:border-ember" />
     </label>
   );
 

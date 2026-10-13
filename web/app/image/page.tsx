@@ -116,7 +116,7 @@ export default function ImagePage() {
   const canGenerate = configured === true && prompt.trim().length > 0;
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-48">
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-8">
       <p className="sr-only" aria-live="polite">{announce}</p>
 
       {configured === false && (

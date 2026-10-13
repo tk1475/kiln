@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { ASPECTS, AspectId } from "@/lib/image";
 
@@ -26,6 +26,12 @@ export default function PromptDock(p: Props) {
   const [compact, setCompact] = useState(false);
   const ownRef = useRef<HTMLTextAreaElement>(null);
   const inputRef = p.inputRef ?? ownRef;
+
+  // Reserve room at the bottom of the page so the dock never hides the footer.
+  useEffect(() => {
+    document.body.style.paddingBottom = "9rem";
+    return () => { document.body.style.paddingBottom = ""; };
+  }, []);
 
   const expand = () => {
     setCompact(false);

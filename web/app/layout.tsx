@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import { themeScript } from "@/components/ThemeToggle";
 import "./globals.css";
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <Nav />
         <main className="flex-1 flex flex-col">{children}</main>
+        <Footer />
       </body>
     </html>
   );

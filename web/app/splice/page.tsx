@@ -44,16 +44,24 @@ export default function SplicePage() {
     listAssets().then((all) => {
       setLibrary(all.filter((a) => a.kind !== "audio"));
       setTracks(all.filter((a) => a.kind === "audio"));
-      // Hand-offs from other studios: /splice?add=<id>[,<id>] and /splice?track=<id>
+      // Hand-offs from other studios: /splice?add=<id>[,<id>] and /splice?track=<id>. Runs once per page load.
+      if (handedOff.current) return;
+      handedOff.current = true;
       const q = new URLSearchParams(location.search);
       const add = (q.get("add") ?? "").split(",").map((id) => all.find((a) => a.id === id && a.kind !== "audio")).filter((a): a is Asset => !!a);
       if (add.length) setTimeline(add);
       const t = all.find((a) => a.id === q.get("track") && a.kind === "audio");
       if (t) setTrack(t);
+      // /splice?clip=<set>/<id>[,…] imports sample clips from the asset library onto the timeline
+      for (const key of (q.get("clip") ?? "").split(",").filter(Boolean)) {
+        const c = CLIPS.find((x) => clipKey(x) === key);
+        if (c) addClip(c);
+      }
     });
   }, []);
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const handedOff = useRef(false);
 
   const addFiles = async (files: FileList | null) => {
     if (!files?.length) return;

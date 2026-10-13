@@ -104,12 +104,13 @@ export default function ImagePage() {
 
       {empty ? (
         <section className="flex flex-1 flex-col items-center justify-center py-16 text-center">
-          <div aria-hidden className="mb-8 flex items-end justify-center">
+          <div aria-hidden className="mb-2 flex items-end justify-center">
             {SAMPLES.slice(0, 5).map((n, i) => (
               <img key={n} src={libraryUrl(n)} alt="" className="-mx-3 h-28 w-20 rounded-xl border-2 border-panel object-cover shadow-2xl sm:h-36 sm:w-28"
                 style={{ transform: `rotate(${(i - 2) * 7}deg) translateY(${Math.abs(i - 2) * 10}px)`, zIndex: 5 - Math.abs(i - 2) }} />
             ))}
           </div>
+          <p className="mb-8 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Sample images · not generated here</p>
           <h1 className="font-display text-5xl sm:text-6xl">
             Fire up an <span className="text-muted">image</span>
           </h1>

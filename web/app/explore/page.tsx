@@ -78,7 +78,7 @@ export default function ExplorePage() {
           <li className="relative h-40 w-44 shrink-0 overflow-hidden rounded-2xl">
             <img src={libraryUrl(SAMPLES[2])} alt="" className="h-full w-full object-cover" />
             <span className="absolute inset-x-2 bottom-2 rounded-xl bg-bg/90 px-2.5 py-1.5 text-xs">
-              <span className="block text-muted">Video</span>Push In · 5s
+              <span className="block text-muted">Sample image</span>Try it with Push In
             </span>
           </li>
           <li className="flex w-56 shrink-0 flex-col justify-center rounded-2xl bg-[#101114] p-4 text-white">

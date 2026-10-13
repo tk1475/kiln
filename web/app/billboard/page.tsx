@@ -1,6 +1,7 @@
 "use client";
 
 import ToolHeader from "@/components/ToolHeader";
+import NextSteps from "@/components/NextSteps";
 import { useEffect, useRef, useState } from "react";
 import { Asset, downloadBlob, saveAsset } from "@/lib/assets";
 import { loadImage } from "@/lib/image";
@@ -104,6 +105,7 @@ export default function BillboardPage() {
   const [copy, setCopy] = useState<Copy>({ headline: "Made in the kiln", sub: "Fresh visuals, fired up in seconds.", cta: "Try it free" });
   const [display, setDisplay] = useState("sans-serif");
   const [saved, setSaved] = useState<string>();
+  const [output, setOutput] = useState<Asset>();
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -133,6 +135,7 @@ export default function BillboardPage() {
     await saveAsset(a);
     downloadBlob(blob, `kiln-ad-${format.toLowerCase()}-${a.id.slice(0, 6)}.png`);
     setSaved(`${format} ad saved and downloaded.`);
+    setOutput(a);
   };
 
   const field = (k: keyof Copy, label: string, max: number) => (
@@ -159,7 +162,7 @@ export default function BillboardPage() {
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[340px_1fr]">
       <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
         <ToolHeader tool="billboard" eyebrow="Studio" title="Billboard" line="Turn any image into an ad." />
-        <Step n={1} title="Hero image"><SourcePicker value={source} onChange={setSource} /></Step>
+        <Step n={1} title="Hero image"><SourcePicker value={source} onChange={(a) => { setSource(a); setSaved(undefined); setOutput(undefined); }} /></Step>
         <Step n={2} title="Copy">
           <div className="space-y-2">{field("headline", "Headline", 48)}{field("sub", "Supporting line", 90)}{field("cta", "Button", 24)}</div>
         </Step>
@@ -169,10 +172,13 @@ export default function BillboardPage() {
         <button onClick={save} disabled={!img} className="btn-ember rounded-full py-3 font-semibold disabled:opacity-40">Save &amp; download PNG</button>
         <p aria-live="polite" className="text-sm text-ember-2">{saved}</p>
       </aside>
+      <div className="flex flex-col gap-6">
       <section className="flex min-h-[420px] items-center justify-center rounded-3xl bg-panel p-4">
         {img ? <canvas ref={ref} className="max-h-[75vh] max-w-full rounded-xl shadow-2xl" aria-label="Ad preview" />
           : <div className="flex flex-col items-center gap-3 text-center"><img src={icon3d("megaphone")} alt="" className="h-16 w-16" /><p className="text-muted">Pick a hero image to start your ad.</p></div>}
       </section>
+      {output && <NextSteps asset={output} from="billboard" />}
+      </div>
     </div>
   );
 }

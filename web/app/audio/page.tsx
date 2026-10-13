@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import NextSteps from "@/components/NextSteps";
 import { Asset, LABEL_TEXT, deleteAsset, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { MOODS, Mood, renderMood, toWav } from "@/lib/audio";
 import { useObjectUrl } from "@/components/useObjectUrl";
@@ -15,6 +17,24 @@ export default function AudioPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
   const [tracks, setTracks] = useState<Asset[]>([]);
+  const [latest, setLatest] = useState<Asset>();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const upload = async (file?: File | null) => {
+    if (!file) return;
+    if (!file.type.startsWith("audio/")) { setError("Choose an audio file: MP3, WAV, M4A or OGG."); return; }
+    setError(undefined);
+    try {
+      const ctx = new OfflineAudioContext(1, 1, 44100);
+      const buf = await ctx.decodeAudioData(await file.arrayBuffer());
+      const a: Asset = { id: crypto.randomUUID(), kind: "audio", label: "user-upload", createdAt: Date.now(), blob: file, width: 0, height: 0, durationS: Math.round(buf.duration), prompt: file.name };
+      await saveAsset(a);
+      setTracks((t) => [a, ...t]);
+      setLatest(a);
+    } catch {
+      setError("Couldn't read that audio file.");
+    }
+  };
 
   useEffect(() => {
     listAssets("audio").then(setTracks);
@@ -28,6 +48,7 @@ export default function AudioPage() {
       const a: Asset = { id: crypto.randomUUID(), kind: "audio", label: "local-synth", createdAt: Date.now(), blob, width: 0, height: 0, presetId: mood.id, durationS: length };
       await saveAsset(a);
       setTracks((t) => [a, ...t]);
+      setLatest(a);
     } catch {
       setError("Audio rendering isn't supported in this browser.");
     } finally {
@@ -67,8 +88,14 @@ export default function AudioPage() {
         <button onClick={render} disabled={busy} className="btn-ember rounded-full px-5 py-2.5 font-semibold disabled:opacity-50">
           {busy ? "Rendering…" : "Render track"}
         </button>
+        <button onClick={() => fileRef.current?.click()} className="rounded-full bg-panel px-5 py-2.5 font-mono text-xs uppercase tracking-[0.12em] hover:bg-panel-2">
+          Upload a track
+        </button>
+        <input ref={fileRef} type="file" accept="audio/*" className="hidden" onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
       </div>
+
+      {latest && <div className="mt-10"><NextSteps asset={latest} from="audio" /></div>}
 
       {tracks.length > 0 && (
         <section className="mt-10">
@@ -90,11 +117,12 @@ function Track({ asset, onDelete }: { asset: Asset; onDelete: () => void }) {
   return (
     <li className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-panel p-3">
       <span className="min-w-32 text-sm">
-        <span className="block font-medium">{mood?.name}</span>
+        <span className="block max-w-48 truncate font-medium">{mood?.name ?? asset.prompt ?? "Track"}</span>
         <span className="text-xs text-muted">{asset.durationS}s · {LABEL_TEXT[asset.label]}</span>
       </span>
       {url && <audio src={url} controls className="h-9 flex-1" />}
-      <button onClick={() => downloadBlob(asset.blob, `kiln-${mood?.id}-${asset.id.slice(0, 6)}.wav`)} className="rounded-full bg-panel-2 px-3 py-1 text-xs">Download</button>
+      <Link href={`/splice?track=${asset.id}`} className="rounded-full bg-panel-2 px-3 py-1 text-xs">Use in Splice</Link>
+      <button onClick={() => downloadBlob(asset.blob, asset.label === "user-upload" ? asset.prompt ?? "track" : `kiln-${mood?.id}-${asset.id.slice(0, 6)}.wav`)} className="rounded-full bg-panel-2 px-3 py-1 text-xs">Download</button>
       <button onClick={onDelete} className="px-2 text-xs text-muted hover:text-danger">Delete</button>
     </li>
   );

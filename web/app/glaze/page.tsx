@@ -1,6 +1,7 @@
 "use client";
 
 import ToolHeader from "@/components/ToolHeader";
+import NextSteps from "@/components/NextSteps";
 import { useEffect, useRef, useState } from "react";
 import { Asset, downloadBlob, saveAsset } from "@/lib/assets";
 import { GLAZES, Glaze } from "@/lib/glaze";
@@ -16,6 +17,7 @@ export default function GlazePage() {
   const [glaze, setGlaze] = useState<Glaze>(GLAZES[0]);
   const [k, setK] = useState(0.7);
   const [saved, setSaved] = useState<string>();
+  const [output, setOutput] = useState<Asset>();
   const preview = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -46,13 +48,14 @@ export default function GlazePage() {
     await saveAsset(a);
     downloadBlob(blob, `kiln-${glaze.id}-${a.id.slice(0, 6)}.jpg`);
     setSaved(`${glaze.name} saved to your images and downloaded.`);
+    setOutput(a);
   };
 
   return (
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[340px_1fr]">
       <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
         <ToolHeader tool="glaze" eyebrow="Studio" title="Glaze" line="Film, glitch and VHS looks." />
-        <Step n={1} title="Image"><SourcePicker value={source} onChange={(a) => { setSource(a); setSaved(undefined); }} /></Step>
+        <Step n={1} title="Image"><SourcePicker value={source} onChange={(a) => { setSource(a); setSaved(undefined); setOutput(undefined); }} /></Step>
         <Step n={2} title="Intensity">
           <input type="range" min={0} max={1} step={0.05} value={k} onChange={(e) => setK(Number(e.target.value))} className="w-full accent-[var(--ember)]" aria-label="Intensity" />
         </Step>
@@ -66,6 +69,7 @@ export default function GlazePage() {
           {img ? <canvas ref={preview} className="max-h-[60vh] max-w-full rounded-xl" aria-label={`Preview with ${glaze.name}`} />
             : <div className="flex flex-col items-center gap-3 text-center"><img src={icon3d("paintbrush")} alt="" className="h-16 w-16" /><p className="text-muted">Pick an image to glaze.</p></div>}
         </div>
+        {output && <NextSteps asset={output} from="glaze" />}
         <div role="radiogroup" aria-label="Effect" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {GLAZES.map((g) => (
             <button key={g.id} role="radio" aria-checked={g.id === glaze.id} onClick={() => setGlaze(g)}

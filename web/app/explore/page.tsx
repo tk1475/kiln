@@ -8,6 +8,9 @@ import { CLIPS, SAMPLES, SampleClip, TOOL_ICONS, clipPoster, clipUrl, glyph, ico
 import { PRESETS } from "@/lib/motion";
 import { GLAZES } from "@/lib/glaze";
 import { useObjectUrl } from "@/components/useObjectUrl";
+import BlurText from "@/components/reactbits/BlurText";
+import CountUp from "@/components/reactbits/CountUp";
+import Spotlight from "@/components/Spotlight";
 
 const TOOLS = [
   { key: "image", href: "/image", name: "Image", line: "Text to image with FLUX.1 schnell" },
@@ -58,7 +61,8 @@ export default function ExplorePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-transparent" />
         <div className="relative px-6 pb-56 pt-16 text-white sm:px-10 sm:pb-64 sm:pt-24">
           <h1 className="font-display max-w-2xl text-5xl sm:text-7xl">
-            Make it, move it,<br /><span className="text-white/60">score it.</span>
+            <BlurText text="Make it, move it," animateBy="words" delay={90} />
+            <BlurText text="score it." animateBy="words" delay={90} className="text-white/60" />
           </h1>
           <p className="mt-5 max-w-md text-white/85">
             Generate an image, give it a camera move, add a soundtrack and cut it into one edit. Open models and on-device
@@ -129,7 +133,7 @@ export default function ExplorePage() {
               {[...PRESETS, ...PRESETS].map((p, i) => <span key={i} className="shrink-0 rounded-full bg-bg px-3 py-1 text-xs">{p.name}</span>)}
             </div>
           </div>
-          <div><p className="text-sm text-muted">Camera moves</p><p className="font-display text-5xl">{PRESETS.length}</p></div>
+          <div><p className="text-sm text-muted">Camera moves</p><p className="font-display text-5xl"><CountUp to={PRESETS.length} duration={1.2} /></p></div>
         </div>
         <div className="flex min-h-56 flex-col justify-between rounded-3xl bg-ember p-5">
           <div className="flex items-start justify-between"><p className="text-sm">Cost to use</p><img src={glyph("stopwatch")} alt="" className="h-14 w-14" /></div>
@@ -138,11 +142,11 @@ export default function ExplorePage() {
         <div className="relative flex min-h-56 flex-col justify-end overflow-hidden rounded-3xl p-5 text-white">
           <img src={libraryUrl(SAMPLES[9])} alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-          <div className="relative"><p className="font-display text-5xl">{GLAZES.length}</p><p className="mt-2 text-sm text-white/85">Glaze looks, from film stock to VHS.</p></div>
+          <div className="relative"><p className="font-display text-5xl"><CountUp to={GLAZES.length} duration={1.2} /></p><p className="mt-2 text-sm text-white/85">Glaze looks, from film stock to VHS.</p></div>
         </div>
         <div className="flex min-h-56 flex-col justify-between rounded-3xl bg-panel p-5">
           <div className="flex items-start justify-between"><p className="text-sm text-muted">Sample library</p><img src={glyph("frames")} alt="" className="h-14 w-14" /></div>
-          <div><p className="font-display text-5xl">{SAMPLES.length + CLIPS.length}</p><p className="mt-3 text-sm">{SAMPLES.length} frames and {CLIPS.length} clips to animate, glaze, cut or turn into an ad.</p></div>
+          <div><p className="font-display text-5xl"><CountUp to={SAMPLES.length + CLIPS.length} duration={1.6} /></p><p className="mt-3 text-sm">{SAMPLES.length} frames and {CLIPS.length} clips to animate, glaze, cut or turn into an ad.</p></div>
         </div>
       </section>
 
@@ -161,13 +165,15 @@ export default function ExplorePage() {
         <ul className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-3">
           {TOOLS.map((t) => (
             <li key={t.key}>
-              <Link href={t.href} className="group flex h-full flex-col rounded-3xl bg-panel p-5 transition-colors hover:bg-panel-2">
-                <img src={icon3d(TOOL_ICONS[t.key])} alt="" className="h-14 w-14 transition-transform group-hover:-translate-y-1 group-hover:rotate-[-6deg]" />
-                <p className="mt-8 flex items-center gap-2 text-xl font-medium tracking-tight">
-                  {t.name}
-                  {t.badge && <span className={t.badge === "Top" ? "badge !bg-panel-2 !text-fg" : "badge"}>{t.badge}</span>}
-                </p>
-                <p className="text-sm text-muted">{t.line}</p>
+              <Link href={t.href} className="group block h-full rounded-3xl">
+                <Spotlight className="h-full">
+                  <img src={icon3d(TOOL_ICONS[t.key])} alt="" className="h-14 w-14 transition-transform duration-300 group-hover:-translate-y-1 group-hover:rotate-[-6deg]" />
+                  <p className="mt-8 flex items-center gap-2 text-xl font-medium tracking-tight">
+                    {t.name}
+                    {t.badge && <span className={t.badge === "Top" ? "badge !bg-panel-2 !text-fg" : "badge"}>{t.badge}</span>}
+                  </p>
+                  <p className="text-sm text-muted">{t.line}</p>
+                </Spotlight>
               </Link>
             </li>
           ))}

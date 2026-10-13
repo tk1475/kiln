@@ -1,6 +1,7 @@
 "use client";
 
 import ToolHeader from "@/components/ToolHeader";
+import NextSteps from "@/components/NextSteps";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Asset, LABEL_TEXT, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { loadImage } from "@/lib/image";
@@ -125,6 +126,8 @@ export default function VideoPage() {
             </div>
           )}
         </div>
+
+        {result && <NextSteps asset={result} from="video" />}
 
         {clips.length > 0 && (
           <div>

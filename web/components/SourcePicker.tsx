@@ -8,6 +8,7 @@ import { Asset, LABEL_TEXT, getAsset, listAssets, saveAsset } from "@/lib/assets
 import { loadImage } from "@/lib/image";
 import { SAMPLES, SampleClip, clipKey, clipUrl, libraryUrl } from "@/lib/library";
 import { useObjectUrl } from "@/components/useObjectUrl";
+import { mp4Duration } from "@/lib/media";
 
 type Props = { value?: Asset; onChange: (a: Asset) => void };
 
@@ -60,18 +61,6 @@ async function doImportClip(clip: SampleClip): Promise<Asset> {
   return a;
 }
 
-/** Reads duration in seconds from an MP4's mvhd box, without a media element (those stall in background tabs). */
-function mp4Duration(b: Uint8Array): number | undefined {
-  const d = new DataView(b.buffer, b.byteOffset, b.byteLength);
-  for (let i = 4; i < b.length - 32; i++) {
-    if (b[i] !== 0x6d || b[i + 1] !== 0x76 || b[i + 2] !== 0x68 || b[i + 3] !== 0x64) continue; // "mvhd"
-    const v1 = b[i + 4] === 1;
-    const scale = d.getUint32(i + (v1 ? 24 : 16));
-    const dur = v1 ? Number(d.getBigUint64(i + 28)) : d.getUint32(i + 20);
-    return scale ? Math.round((dur / scale) * 10) / 10 : undefined;
-  }
-}
-
 /** Pick one of your images, a library sample, or add one by upload, drop or paste. Reads ?src= and ?sample=. */
 export default function SourcePicker(props: Props) {
   return (
@@ -88,6 +77,7 @@ function Picker({ value, onChange }: Props) {
   const [loading, setLoading] = useState<string>();
   const [error, setError] = useState<string>();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [link, setLink] = useState("");
   const changeRef = useRef(onChange);
   useEffect(() => { changeRef.current = onChange; });
 
@@ -119,6 +109,24 @@ function Picker({ value, onChange }: Props) {
     setImages((x) => [a, ...x]);
     setTab("yours");
     onChange(a);
+  };
+
+  const importLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    let url: URL;
+    try { url = new URL(link.trim()); } catch { setError("Paste a full image link starting with https://"); return; }
+    setLoading("link");
+    setError(undefined);
+    try {
+      const res = await fetch(url, { mode: "cors" });
+      const blob = await res.blob();
+      if (!res.ok || !blob.type.startsWith("image/")) throw new Error();
+      await addFile(new File([blob], url.pathname.split("/").pop() || url.hostname, { type: blob.type }));
+      setLink("");
+    } catch {
+      setError("That site doesn't allow images to be loaded from here. Save it and upload it instead.");
+    }
+    setLoading(undefined);
   };
 
   useEffect(() => {
@@ -161,9 +169,14 @@ function Picker({ value, onChange }: Props) {
         </ul>
       )}
 
-      <button onClick={() => fileRef.current?.click()} className="w-full rounded-lg bg-panel-2 py-2 text-sm">Upload image</button>
-      <p className="mt-1.5 text-center text-[11px] text-muted">or drop / paste · <Link href="/image" className="underline">generate one</Link></p>
-      <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => addFile(e.target.files?.[0])} />
+      <button onClick={() => fileRef.current?.click()} className="w-full rounded-full bg-panel-2 py-2 font-mono text-xs uppercase tracking-[0.12em] hover:bg-line">Upload image</button>
+      <form onSubmit={importLink} className="mt-1.5 flex gap-1">
+        <input value={link} onChange={(e) => setLink(e.target.value)} type="url" inputMode="url" placeholder="or paste an image link" aria-label="Image link"
+          className="min-w-0 flex-1 rounded-full border border-line bg-bg px-3 py-1.5 text-xs outline-none focus:border-ember" />
+        <button disabled={!link.trim() || loading === "link"} className="rounded-full bg-fg px-3 text-xs text-bg disabled:opacity-40">{loading === "link" ? "…" : "Add"}</button>
+      </form>
+      <p className="mt-1.5 text-center text-[11px] text-muted">Drop or paste a file too · <Link href="/image" className="underline">generate one</Link></p>
+      <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => { addFile(e.target.files?.[0]); e.target.value = ""; }} />
       {error && <p role="alert" className="mt-1 text-xs text-danger">{error}</p>}
     </div>
   );

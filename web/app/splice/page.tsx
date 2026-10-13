@@ -4,8 +4,11 @@ import ToolHeader from "@/components/ToolHeader";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { Asset, LABEL_TEXT, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { MOODS } from "@/lib/audio";
+import { loadImage } from "@/lib/image";
+import { probeVideo } from "@/lib/media";
 import { MotionAspect, OUTPUT_SIZES } from "@/lib/motion";
 import { renderSplice, totalSeconds } from "@/lib/splice";
 import { Step, importClip } from "@/components/SourcePicker";
@@ -41,8 +44,49 @@ export default function SplicePage() {
     listAssets().then((all) => {
       setLibrary(all.filter((a) => a.kind !== "audio"));
       setTracks(all.filter((a) => a.kind === "audio"));
+      // Hand-offs from other studios: /splice?add=<id>[,<id>] and /splice?track=<id>
+      const q = new URLSearchParams(location.search);
+      const add = (q.get("add") ?? "").split(",").map((id) => all.find((a) => a.id === id && a.kind !== "audio")).filter((a): a is Asset => !!a);
+      if (add.length) setTimeline(add);
+      const t = all.find((a) => a.id === q.get("track") && a.kind === "audio");
+      if (t) setTrack(t);
     });
   }, []);
+
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const addFiles = async (files: FileList | null) => {
+    if (!files?.length) return;
+    setError(undefined);
+    for (const file of Array.from(files)) {
+      try {
+        const base = { id: crypto.randomUUID(), label: "user-upload" as const, createdAt: Date.now(), blob: file, prompt: file.name };
+        if (file.type.startsWith("image/")) {
+          const i = await loadImage(file);
+          URL.revokeObjectURL(i.src);
+          const a: Asset = { ...base, kind: "image", width: i.naturalWidth, height: i.naturalHeight };
+          await saveAsset(a);
+          setLibrary((l) => [a, ...l]);
+          setTimeline((t) => [...t, a]);
+        } else if (file.type.startsWith("video/")) {
+          const a: Asset = { ...base, kind: "motion", ...(await probeVideo(file)) };
+          await saveAsset(a);
+          setLibrary((l) => [a, ...l]);
+          setTimeline((t) => [...t, a]);
+        } else if (file.type.startsWith("audio/")) {
+          const buf = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(await file.arrayBuffer());
+          const a: Asset = { ...base, kind: "audio", width: 0, height: 0, durationS: Math.round(buf.duration) };
+          await saveAsset(a);
+          setTracks((t) => [a, ...t]);
+          setTrack(a);
+        } else {
+          setError(`${file.name} isn't an image, video or audio file.`);
+        }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : `Couldn't read ${file.name}.`);
+      }
+    }
+  };
 
   const move = (i: number, d: number) =>
     setTimeline((t) => {
@@ -75,7 +119,11 @@ export default function SplicePage() {
 
   return (
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[380px_1fr]">
-      <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
+      <aside
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => { e.preventDefault(); addFiles(e.dataTransfer.files); }}
+        className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start"
+      >
         <ToolHeader tool="splice" eyebrow="Studio" title="Splice" line="Cut shots and sound into one edit." />
 
         <Step n={1} title="Add shots">
@@ -113,18 +161,28 @@ export default function SplicePage() {
           </ul>
         </div>
 
+        <button onClick={() => fileRef.current?.click()} className="w-full rounded-full bg-panel-2 py-2 font-mono text-xs uppercase tracking-[0.12em] hover:bg-line">
+          Upload images, clips or music
+        </button>
+        <p className="-mt-2 text-center text-[11px] text-muted">or drop files anywhere on this panel</p>
+        <input ref={fileRef} type="file" multiple accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime,audio/*" className="hidden"
+          onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} />
+
         <Step n={2} title={`Timeline · ${totalSeconds(timeline).toFixed(1)}s`}>
           {timeline.length === 0 ? <p className="text-sm text-muted">Tap shots above to add them in order.</p> : (
             <ol className="space-y-1.5">
+              <AnimatePresence initial={false}>
               {timeline.map((a, i) => (
-                <li key={`${a.id}-${i}`} className="flex items-center gap-2 rounded-lg bg-panel-2 p-1.5 text-xs">
+                <motion.li key={`${a.id}-${timeline.slice(0, i).filter((x) => x.id === a.id).length}`} layout initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 12 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex items-center gap-2 rounded-lg bg-panel-2 p-1.5 text-xs">
                   <span className="relative block h-9 w-9 shrink-0 overflow-hidden rounded"><Media asset={a} /></span>
                   <span className="flex-1 truncate">{i + 1}. {a.kind === "image" ? "Still · 2.5s push-in" : `${a.label === "sample" ? "Sample clip" : "Clip"} · ${a.durationS}s`}</span>
                   <button aria-label="Move up" disabled={i === 0} onClick={() => move(i, -1)} className="px-1 disabled:opacity-30">↑</button>
                   <button aria-label="Move down" disabled={i === timeline.length - 1} onClick={() => move(i, 1)} className="px-1 disabled:opacity-30">↓</button>
                   <button aria-label="Remove" onClick={() => setTimeline((t) => t.filter((_, j) => j !== i))} className="px-1 text-muted hover:text-danger">✕</button>
-                </li>
+                </motion.li>
               ))}
+              </AnimatePresence>
             </ol>
           )}
         </Step>
@@ -133,9 +191,9 @@ export default function SplicePage() {
           <select value={track?.id ?? ""} onChange={(e) => setTrack(tracks.find((t) => t.id === e.target.value))}
             className="w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm focus:border-ember" aria-label="Soundtrack">
             <option value="">None</option>
-            {tracks.map((t) => <option key={t.id} value={t.id}>{MOODS.find((m) => m.id === t.presetId)?.name} · {t.durationS}s</option>)}
+            {tracks.map((t) => <option key={t.id} value={t.id}>{MOODS.find((m) => m.id === t.presetId)?.name ?? t.prompt ?? "Track"} · {t.durationS}s</option>)}
           </select>
-          {tracks.length === 0 && <p className="mt-1 text-[11px] text-muted"><Link href="/audio" className="underline">Render a track</Link> to score your edit.</p>}
+          {tracks.length === 0 && <p className="mt-1 text-[11px] text-muted"><Link href="/audio" className="underline">Render a track</Link> or upload one above to score your edit.</p>}
         </Step>
 
         <div role="radiogroup" aria-label="Aspect" className="flex rounded-lg bg-panel-2 p-0.5">

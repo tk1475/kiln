@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Asset, LABEL_TEXT, deleteAsset, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { ASPECTS, AspectId, cropToAspect } from "@/lib/image";
 import { useObjectUrl } from "@/components/useObjectUrl";
-import { SAMPLES, libraryUrl } from "@/lib/library";
+import { SAMPLES, TOOL_ICONS, icon3d, libraryUrl } from "@/lib/library";
 
 type Job = { id: string; prompt: string; aspect: AspectId; status: "running" | "error"; error?: string };
 
@@ -234,6 +234,18 @@ function ResultCard({ asset, onRemix, onDelete }: { asset: Asset; onRemix: () =>
           </button>
           <button onClick={onDelete} aria-label="Delete image" className="ml-auto rounded-full px-2 py-1 text-muted hover:text-danger">Delete</button>
         </div>
+        <nav aria-label="Next step" className="flex flex-wrap items-center gap-1.5 border-t border-line pt-2 text-xs">
+          <span className="eyebrow mr-1 text-muted">Next</span>
+          {[
+            { href: `/glaze?src=${asset.id}`, icon: TOOL_ICONS.glaze, label: "Glaze" },
+            { href: `/billboard?src=${asset.id}`, icon: TOOL_ICONS.billboard, label: "Make an ad" },
+            { href: `/splice?add=${asset.id}`, icon: TOOL_ICONS.splice, label: "Add to edit" },
+          ].map((n) => (
+            <Link key={n.label} href={n.href} className="group flex items-center gap-1 rounded-full bg-panel-2 py-0.5 pl-1 pr-2.5 transition-colors hover:bg-ember hover:text-on-ember">
+              <img src={icon3d(n.icon)} alt="" className="h-5 w-5 transition-transform group-hover:-rotate-12" />{n.label}
+            </Link>
+          ))}
+        </nav>
       </figcaption>
     </figure>
   );

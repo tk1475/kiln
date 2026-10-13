@@ -1,6 +1,6 @@
 import { createStore, del, get, keys, set } from "idb-keyval";
 
-export type AssetLabel = "ai-generated" | "local-render" | "local-synth" | "user-upload";
+export type AssetLabel = "ai-generated" | "local-render" | "local-synth" | "local-edit" | "user-upload";
 
 export interface Asset {
   id: string;
@@ -45,6 +45,7 @@ export const LABEL_TEXT: Record<AssetLabel, string> = {
   "ai-generated": "AI · FLUX.1 schnell",
   "local-render": "Local motion render",
   "local-synth": "Local synth render",
+  "local-edit": "Local edit",
   "user-upload": "Your upload",
 };
 

@@ -63,6 +63,16 @@ function pickMime() {
   return options.find((m) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m));
 }
 
+export const HIDDEN_ERROR = "Rendering stopped because the tab was hidden. Keep Kiln visible while it renders, then try again.";
+
+/** Tracks whether the page was hidden at any point; real-time capture breaks when it is. */
+export function watchHidden() {
+  const state = { hidden: document.hidden, stop: () => document.removeEventListener("visibilitychange", on) };
+  function on() { if (document.hidden) state.hidden = true; }
+  document.addEventListener("visibilitychange", on);
+  return state;
+}
+
 export function canRecord() {
   return typeof MediaRecorder !== "undefined" && !!pickMime() && "captureStream" in HTMLCanvasElement.prototype;
 }
@@ -78,6 +88,8 @@ export function renderMotion(
 ): Promise<Blob> {
   const mime = pickMime();
   if (!mime) return Promise.reject(new Error("This browser can't record video. Try Chrome, Edge or Firefox."));
+  if (document.hidden) return Promise.reject(new Error(HIDDEN_ERROR));
+  const vis = watchHidden();
   const [W, H] = OUTPUT_SIZES[aspect];
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -95,14 +107,17 @@ export function renderMotion(
     let start = 0;
     rec.onstop = () => {
       cancelAnimationFrame(raf);
+      vis.stop();
       stream.getTracks().forEach((tr) => tr.stop());
       if (signal.aborted) reject(new DOMException("Cancelled", "AbortError"));
+      else if (vis.hidden) reject(new Error(HIDDEN_ERROR));
       else resolve(new Blob(chunks, { type: mime.split(";")[0] }));
     };
     rec.onerror = () => reject(new Error("Recording failed."));
     signal.addEventListener("abort", () => rec.state !== "inactive" && rec.stop(), { once: true });
 
     const tick = (now: number) => {
+      if (vis.hidden) { rec.stop(); return; }
       if (!start) start = now;
       const t = (now - start) / (durationS * 1000);
       drawFrame(ctx, img, preset, t);

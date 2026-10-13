@@ -103,7 +103,7 @@ export default function ImagePage() {
 
       {empty ? (
         <section className="flex flex-1 flex-col items-center justify-center py-16 text-center">
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="font-display text-5xl uppercase sm:text-6xl">
             Fire up an <span className="bg-gradient-to-r from-ember to-ember-2 bg-clip-text text-transparent">image</span>
           </h1>
           <p className="mt-3 max-w-md text-muted">

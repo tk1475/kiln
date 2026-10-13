@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0f0d0c;
-  --panel: #1a1715;
-  --panel-2: #24201d;
-  --line: #342e2a;
-  --fg: #f3ede7;
-  --muted: #a39890;
+  --bg: #0c0d0e;
+  --panel: #151618;
+  --panel-2: #1f2023;
+  --line: #2a2c30;
+  --fg: #f4f4f5;
+  --muted: #8d8f96;
   --ember: #ff6a3d;
   --ember-2: #ffb547;
   --danger: #ff5a6e;
@@ -24,6 +24,7 @@
   --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-anton);
 }
 
 body {
@@ -47,7 +48,7 @@ body {
   100% { background-position: 200% 50%; }
 }
 .kiln-loading {
-  background: linear-gradient(110deg, #1f1b18 20%, #3a2a20 40%, #5a3322 50%, #3a2a20 60%, #1f1b18 80%);
+  background: linear-gradient(110deg, #18191b 20%, #2a2522 40%, #4a2c1f 50%, #2a2522 60%, #18191b 80%);
   background-size: 200% 100%;
   animation: kiln-shimmer 1.6s linear infinite;
 }
@@ -55,4 +56,13 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .kiln-loading { animation: none; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.badge {
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--ember);
+  color: #1a0d06;
 }

@@ -91,7 +91,7 @@ function Motion() {
       setClips((c) => [clip, ...c]);
       setResult(clip);
     } catch (e) {
-      if (!(e instanceof DOMException && e.name === "AbortError")) setError(e instanceof Error ? e.message : "Render failed.");
+      if (!ctrl.signal.aborted) setError(e instanceof Error ? e.message : "Render failed.");
     } finally {
       setProgress(null);
     }
@@ -183,7 +183,7 @@ function Motion() {
         <div role="dialog" aria-modal="true" aria-label="Camera moves" className="fixed inset-0 z-40 overflow-y-auto bg-bg/95 p-4 backdrop-blur" onClick={() => setCatalogOpen(false)}>
           <div className="mx-auto max-w-5xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Camera moves</h2>
+              <h2 className="font-display text-3xl uppercase">Camera moves</h2>
               <button onClick={() => setCatalogOpen(false)} aria-label="Close" className="rounded-full bg-panel-2 px-3 py-1.5 text-sm">Close · Esc</button>
             </div>
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -196,7 +196,7 @@ function Motion() {
                   >
                     <PresetTile img={img} preset={p} />
                     <span className="block bg-panel px-3 py-2">
-                      <span className="block text-sm font-semibold uppercase tracking-wide">{p.name}</span>
+                      <span className="block font-display text-lg uppercase">{p.name}</span>
                       <span className="text-xs text-muted">{p.hint}</span>
                     </span>
                   </button>

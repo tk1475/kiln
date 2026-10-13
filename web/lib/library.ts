@@ -20,3 +20,28 @@ export const TOOL_ICONS: Record<string, string> = {
   explore: "compass", image: "easel", video: "clapper", audio: "headphones", mcp: "puzzle", api: "code",
   glaze: "paintbrush", billboard: "megaphone", splice: "scissors",
 };
+
+const CLIP_BASE = `${BASE}/sky/video`;
+
+export interface SampleClip { id: string; set: "cinema-seedance" | "cinema-seedance-2" | "models-kling"; w: number; h: number }
+
+const set = (name: SampleClip["set"], w: number, h: number, ids: string[]) => ids.map((id) => ({ id, set: name, w, h }));
+
+/** Sample clips with matching .webp posters. Reference footage from the asset library, not Kiln output. */
+export const CLIPS: SampleClip[] = [
+  ...set("cinema-seedance-2", 1120, 630, ["s2-1", "s2-2", "s2-3"]),
+  ...set("cinema-seedance", 1120, 630, ["a-1", "a-2", "a-3", "a-4", "a-5", "a-6", "a-7", "a-8", "u-1", "u-2", "u-3"]),
+  ...set("cinema-seedance", 1600, 900, ["sd-1", "l-1", "l-2", "l-3", "l-4", "l-5", "l-6", "l-7"]),
+  ...set("models-kling", 1280, 720, ["r-1", "r-2", "r-3"]),
+  ...set("models-kling", 960, 720, ["b-3", "b-4"]),
+  ...set("models-kling", 960, 960, ["b-1", "b-6", "b-7"]),
+  ...set("models-kling", 720, 1280, ["b-2"]),
+  ...set("models-kling", 1280, 540, ["b-5"]),
+];
+
+export const clipUrl = (c: SampleClip) => `${CLIP_BASE}/${c.set}/${c.id}.mp4`;
+export const clipPoster = (c: SampleClip) => `${CLIP_BASE}/${c.set}/${c.id}.webp`;
+export const clipKey = (c: SampleClip) => `${c.set}/${c.id}`;
+
+/** 360px 3D glyphs from the same set. */
+export const glyph = (name: "frames" | "lens" | "stopwatch") => `${CLIP_BASE}/cinema-seedance/g-${name}.webp`;

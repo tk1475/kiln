@@ -1,5 +1,6 @@
 "use client";
 
+import ToolHeader from "@/components/ToolHeader";
 import { useEffect, useRef, useState } from "react";
 import { Asset, downloadBlob, saveAsset } from "@/lib/assets";
 import { GLAZES, Glaze } from "@/lib/glaze";
@@ -50,7 +51,7 @@ export default function GlazePage() {
   return (
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[340px_1fr]">
       <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <h1 className="font-display text-4xl">Glaze</h1>
+        <ToolHeader tool="glaze" eyebrow="Studio" title="Glaze" line="Film, glitch and VHS looks." />
         <Step n={1} title="Image"><SourcePicker value={source} onChange={(a) => { setSource(a); setSaved(undefined); }} /></Step>
         <Step n={2} title="Intensity">
           <input type="range" min={0} max={1} step={0.05} value={k} onChange={(e) => setK(Number(e.target.value))} className="w-full accent-[var(--fg)]" aria-label="Intensity" />

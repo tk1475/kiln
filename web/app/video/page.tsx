@@ -1,5 +1,6 @@
 "use client";
 
+import ToolHeader from "@/components/ToolHeader";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Asset, LABEL_TEXT, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { loadImage } from "@/lib/image";
@@ -73,7 +74,7 @@ export default function VideoPage() {
       <p className="sr-only" aria-live="polite">{rendering ? "Rendering clip" : result ? "Clip ready" : ""}</p>
 
       <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <h1 className="font-display text-4xl">Video</h1>
+        <ToolHeader tool="video" eyebrow="Core" title="Video" line="Give any still a camera move." />
         <Step n={1} title="Source image">
           <SourcePicker value={source} onChange={(a) => { setSource(a); setResult(undefined); setError(undefined); }} />
         </Step>
@@ -96,7 +97,7 @@ export default function VideoPage() {
             <div className="h-2 overflow-hidden rounded-full bg-panel-2" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Render progress">
               <div className="btn-ember h-full transition-[width]" style={{ width: `${progress * 100}%` }} />
             </div>
-            <button onClick={() => abortRef.current?.abort()} className="mt-2 w-full rounded-xl bg-panel-2 py-2 text-sm">Cancel</button>
+            <button onClick={() => abortRef.current?.abort()} className="mt-2 w-full rounded-full bg-panel-2 py-2 font-mono text-xs uppercase tracking-[0.12em]">Cancel</button>
           </div>
         ) : (
           <button onClick={render} disabled={!img || !recordable} className="btn-ember rounded-full py-3 font-semibold disabled:opacity-40">

@@ -196,7 +196,7 @@ export default function ImagePage() {
             type="submit"
             disabled={!canGenerate}
             title={configured === false ? "Generation isn't configured" : undefined}
-            className="btn-ember ml-auto rounded-xl px-5 py-2.5 text-sm font-semibold transition-opacity disabled:opacity-40"
+            className="btn-ember ml-auto rounded-full px-5 py-2.5 text-sm font-semibold transition-opacity disabled:opacity-40"
           >
             Generate <span className="ml-1 hidden text-xs font-normal opacity-70 sm:inline">⌘↵</span>
           </button>

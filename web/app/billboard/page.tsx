@@ -1,5 +1,6 @@
 "use client";
 
+import ToolHeader from "@/components/ToolHeader";
 import { useEffect, useRef, useState } from "react";
 import { Asset, downloadBlob, saveAsset } from "@/lib/assets";
 import { loadImage } from "@/lib/image";
@@ -157,7 +158,7 @@ export default function BillboardPage() {
   return (
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[340px_1fr]">
       <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <h1 className="font-display text-4xl">Billboard</h1>
+        <ToolHeader tool="billboard" eyebrow="Studio" title="Billboard" line="Turn any image into an ad." />
         <Step n={1} title="Hero image"><SourcePicker value={source} onChange={setSource} /></Step>
         <Step n={2} title="Copy">
           <div className="space-y-2">{field("headline", "Headline", 48)}{field("sub", "Supporting line", 90)}{field("cta", "Button", 24)}</div>

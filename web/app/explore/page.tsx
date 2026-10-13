@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Asset, LABEL_TEXT, listAssets } from "@/lib/assets";
-import { BANNERS, SAMPLES, TOOL_ICONS, icon3d, libraryUrl } from "@/lib/library";
+import { CLIPS, SAMPLES, SampleClip, TOOL_ICONS, clipPoster, clipUrl, glyph, icon3d, libraryUrl } from "@/lib/library";
 import { PRESETS } from "@/lib/motion";
 import { GLAZES } from "@/lib/glaze";
 import { useObjectUrl } from "@/components/useObjectUrl";
@@ -52,7 +52,7 @@ export default function ExplorePage() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-16">
       <section className="relative overflow-hidden rounded-[28px]">
-        <img src={libraryUrl(BANNERS[0])} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <HeroVideo clip={CLIPS[0]} />
         <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-transparent" />
         <div className="relative px-6 pb-56 pt-16 text-white sm:px-10 sm:pb-64 sm:pt-24">
           <h1 className="font-display max-w-2xl text-5xl sm:text-7xl">
@@ -105,7 +105,22 @@ export default function ExplorePage() {
         </h2>
       </section>
 
-      <section className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mt-24">
+        <p className="eyebrow">Sample reel</p>
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
+          <h2 className="font-display text-4xl sm:text-5xl">Footage to cut with, <span className="text-muted">ready in Splice.</span></h2>
+          <Pill href="/splice" dark>Open Splice</Pill>
+        </div>
+        <p className="mt-3 max-w-xl text-sm text-muted">
+          Reference clips from the ImagineArt asset library. Hover to play, then drop them into a Splice timeline next to
+          your own shots. Kiln did not generate these.
+        </p>
+        <ul className="mt-8 columns-1 gap-4 sm:columns-2 lg:columns-3">
+          {CLIPS.map((c) => <ClipTile key={`${c.set}/${c.id}`} clip={c} />)}
+        </ul>
+      </section>
+
+      <section className="mt-24 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="flex min-h-56 flex-col justify-between overflow-hidden rounded-3xl bg-panel p-5">
           <div className="-mx-5 overflow-hidden">
             <div className="marquee flex w-max gap-1.5 px-5">
@@ -115,7 +130,7 @@ export default function ExplorePage() {
           <div><p className="text-sm text-muted">Camera moves</p><p className="font-display text-5xl">{PRESETS.length}</p></div>
         </div>
         <div className="flex min-h-56 flex-col justify-between rounded-3xl bg-ember p-5">
-          <p className="text-sm">Cost to use</p>
+          <div className="flex items-start justify-between"><p className="text-sm">Cost to use</p><img src={glyph("stopwatch")} alt="" className="h-14 w-14" /></div>
           <div><p className="font-display text-5xl">$0</p><p className="mt-3 text-sm">Open models and on-device rendering. No account needed.</p></div>
         </div>
         <div className="relative flex min-h-56 flex-col justify-end overflow-hidden rounded-3xl p-5 text-white">
@@ -124,8 +139,8 @@ export default function ExplorePage() {
           <div className="relative"><p className="font-display text-5xl">{GLAZES.length}</p><p className="mt-2 text-sm text-white/85">Glaze looks, from film stock to VHS.</p></div>
         </div>
         <div className="flex min-h-56 flex-col justify-between rounded-3xl bg-panel p-5">
-          <p className="text-sm text-muted">Sample library</p>
-          <div><p className="font-display text-5xl">{SAMPLES.length}</p><p className="mt-3 text-sm">Frames ready to animate, glaze or turn into an ad.</p></div>
+          <div className="flex items-start justify-between"><p className="text-sm text-muted">Sample library</p><img src={glyph("frames")} alt="" className="h-14 w-14" /></div>
+          <div><p className="font-display text-5xl">{SAMPLES.length + CLIPS.length}</p><p className="mt-3 text-sm">{SAMPLES.length} frames and {CLIPS.length} clips to animate, glaze, cut or turn into an ad.</p></div>
         </div>
       </section>
 
@@ -197,6 +212,29 @@ function RecentTile({ asset }: { asset: Asset }) {
           : <img src={url} alt={asset.prompt ?? ""} className="h-full w-full object-cover" />)}
         <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px]">{LABEL_TEXT[asset.label]}</span>
       </Link>
+    </li>
+  );
+}
+
+function HeroVideo({ clip }: { clip: SampleClip }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) ref.current?.pause();
+  }, []);
+  return <video ref={ref} src={clipUrl(clip)} poster={clipPoster(clip)} muted loop autoPlay playsInline aria-hidden className="absolute inset-0 h-full w-full object-cover" />;
+}
+
+function ClipTile({ clip }: { clip: SampleClip }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const play = () => ref.current?.play().catch(() => {});
+  const stop = () => { const v = ref.current; if (v) { v.pause(); v.currentTime = 0; } };
+  return (
+    <li className="group relative mb-4 break-inside-avoid overflow-hidden rounded-3xl bg-panel" onMouseEnter={play} onMouseLeave={stop}>
+      <video ref={ref} src={clipUrl(clip)} poster={clipPoster(clip)} muted loop playsInline preload="none"
+        width={clip.w} height={clip.h} className="block h-auto w-full" aria-label="Sample clip" />
+      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px]">Sample clip</span>
+      <span aria-hidden className="absolute bottom-3 right-3 grid h-9 w-9 place-items-center rounded-full bg-ember text-fg transition-opacity group-hover:opacity-0">▶</span>
+      <button onFocus={play} onBlur={stop} className="absolute inset-0" aria-label="Play sample clip preview" />
     </li>
   );
 }

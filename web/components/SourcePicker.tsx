@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Asset, LABEL_TEXT, getAsset, listAssets, saveAsset } from "@/lib/assets";
 import { loadImage } from "@/lib/image";
-import { SAMPLES, libraryUrl } from "@/lib/library";
+import { SAMPLES, SampleClip, clipKey, clipUrl, libraryUrl } from "@/lib/library";
 import { useObjectUrl } from "@/components/useObjectUrl";
 
 type Props = { value?: Asset; onChange: (a: Asset) => void };
@@ -34,6 +34,42 @@ async function doImport(name: string): Promise<Asset> {
   const a: Asset = { id: crypto.randomUUID(), kind: "image", label: "sample", createdAt: Date.now(), blob, width: i.naturalWidth, height: i.naturalHeight, presetId: name };
   await saveAsset(a);
   return a;
+}
+
+/** Imports a library sample clip as a local motion asset (label "sample") so Splice can cut it. */
+export function importClip(clip: SampleClip): Promise<Asset> {
+  const key = `clip:${clipKey(clip)}`;
+  let p = inflight.get(key);
+  if (!p) {
+    p = doImportClip(clip).finally(() => inflight.delete(key));
+    inflight.set(key, p);
+  }
+  return p;
+}
+
+async function doImportClip(clip: SampleClip): Promise<Asset> {
+  const existing = (await listAssets("motion")).find((a) => a.label === "sample" && a.presetId === clipKey(clip));
+  if (existing) return existing;
+  const res = await fetch(clipUrl(clip), { mode: "cors" });
+  if (!res.ok) throw new Error("Couldn't load that clip.");
+  const blob = await res.blob();
+  const durationS = mp4Duration(new Uint8Array(await blob.arrayBuffer()));
+  if (!durationS) throw new Error("Couldn't read that clip.");
+  const a: Asset = { id: crypto.randomUUID(), kind: "motion", label: "sample", createdAt: Date.now(), blob, width: clip.w, height: clip.h, presetId: clipKey(clip), durationS };
+  await saveAsset(a);
+  return a;
+}
+
+/** Reads duration in seconds from an MP4's mvhd box, without a media element (those stall in background tabs). */
+function mp4Duration(b: Uint8Array): number | undefined {
+  const d = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  for (let i = 4; i < b.length - 32; i++) {
+    if (b[i] !== 0x6d || b[i + 1] !== 0x76 || b[i + 2] !== 0x68 || b[i + 3] !== 0x64) continue; // "mvhd"
+    const v1 = b[i + 4] === 1;
+    const scale = d.getUint32(i + (v1 ? 24 : 16));
+    const dur = v1 ? Number(d.getBigUint64(i + 28)) : d.getUint32(i + 20);
+    return scale ? Math.round((dur / scale) * 10) / 10 : undefined;
+  }
 }
 
 /** Pick one of your images, a library sample, or add one by upload, drop or paste. Reads ?src= and ?sample=. */

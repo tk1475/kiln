@@ -1,14 +1,16 @@
 "use client";
 
+import ToolHeader from "@/components/ToolHeader";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Asset, LABEL_TEXT, downloadBlob, listAssets, saveAsset } from "@/lib/assets";
 import { MOODS } from "@/lib/audio";
 import { MotionAspect, OUTPUT_SIZES } from "@/lib/motion";
 import { renderSplice, totalSeconds } from "@/lib/splice";
-import { Step } from "@/components/SourcePicker";
+import { Step, importClip } from "@/components/SourcePicker";
 import { useObjectUrl } from "@/components/useObjectUrl";
-import { icon3d } from "@/lib/library";
+import { CLIPS, SampleClip, clipKey, clipPoster, icon3d } from "@/lib/library";
 
 export default function SplicePage() {
   const [library, setLibrary] = useState<Asset[]>([]);
@@ -19,7 +21,21 @@ export default function SplicePage() {
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string>();
   const [result, setResult] = useState<Asset>();
+  const [clipLoading, setClipLoading] = useState<string>();
   const abortRef = useRef<AbortController | null>(null);
+
+  const addClip = async (c: SampleClip) => {
+    setClipLoading(clipKey(c));
+    setError(undefined);
+    try {
+      const a = await importClip(c);
+      setTimeline((t) => [...t, a]);
+      setLibrary((l) => (l.some((x) => x.id === a.id) ? l : [a, ...l]));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't load that clip.");
+    }
+    setClipLoading(undefined);
+  };
 
   useEffect(() => {
     listAssets().then((all) => {
@@ -60,12 +76,12 @@ export default function SplicePage() {
   return (
     <div className="mx-auto grid w-full max-w-6xl flex-1 gap-6 px-4 py-6 lg:grid-cols-[380px_1fr]">
       <aside className="flex flex-col gap-4 rounded-3xl bg-panel p-4 lg:sticky lg:top-20 lg:self-start">
-        <h1 className="font-display text-4xl">Splice</h1>
+        <ToolHeader tool="splice" eyebrow="Studio" title="Splice" line="Cut shots and sound into one edit." />
 
         <Step n={1} title="Add shots">
           {library.length === 0 ? (
             <p className="rounded-xl border border-dashed border-line p-4 text-sm text-muted">
-              No shots yet. Make an <Link href="/image" className="underline">image</Link> or a <Link href="/video" className="underline">clip</Link> first.
+              No shots of your own yet. Make an <Link href="/image" className="underline">image</Link> or a <Link href="/video" className="underline">clip</Link> first.
             </p>
           ) : (
             <ul className="grid max-h-48 grid-cols-4 gap-1.5 overflow-y-auto">
@@ -82,13 +98,28 @@ export default function SplicePage() {
           )}
         </Step>
 
+        <div>
+          <p className="mb-1.5 text-[11px] text-muted">Sample clips · reference footage from the asset library</p>
+          <ul className="flex gap-1.5 overflow-x-auto pb-1" aria-label="Sample clips">
+            {CLIPS.map((c) => (
+              <li key={clipKey(c)} className="shrink-0">
+                <button onClick={() => addClip(c)} disabled={!!clipLoading} aria-label={`Add sample clip ${c.id} to timeline`}
+                  className="relative block h-12 w-20 overflow-hidden rounded-lg border border-line hover:border-fg disabled:cursor-wait">
+                  <Image src={clipPoster(c)} alt="" fill sizes="80px" className={`object-cover ${clipLoading === clipKey(c) ? "opacity-40" : ""}`} />
+                  {clipLoading === clipKey(c) && <span className="absolute inset-0 grid place-items-center text-[10px] text-white">Loading</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <Step n={2} title={`Timeline · ${totalSeconds(timeline).toFixed(1)}s`}>
           {timeline.length === 0 ? <p className="text-sm text-muted">Tap shots above to add them in order.</p> : (
             <ol className="space-y-1.5">
               {timeline.map((a, i) => (
                 <li key={`${a.id}-${i}`} className="flex items-center gap-2 rounded-lg bg-panel-2 p-1.5 text-xs">
                   <span className="relative block h-9 w-9 shrink-0 overflow-hidden rounded"><Media asset={a} /></span>
-                  <span className="flex-1 truncate">{i + 1}. {a.kind === "image" ? "Still · 2.5s push-in" : `Clip · ${a.durationS}s`}</span>
+                  <span className="flex-1 truncate">{i + 1}. {a.kind === "image" ? "Still · 2.5s push-in" : `${a.label === "sample" ? "Sample clip" : "Clip"} · ${a.durationS}s`}</span>
                   <button aria-label="Move up" disabled={i === 0} onClick={() => move(i, -1)} className="px-1 disabled:opacity-30">↑</button>
                   <button aria-label="Move down" disabled={i === timeline.length - 1} onClick={() => move(i, 1)} className="px-1 disabled:opacity-30">↓</button>
                   <button aria-label="Remove" onClick={() => setTimeline((t) => t.filter((_, j) => j !== i))} className="px-1 text-muted hover:text-danger">✕</button>
@@ -119,7 +150,7 @@ export default function SplicePage() {
             <div className="h-2 overflow-hidden rounded-full bg-panel-2" role="progressbar" aria-label="Render progress" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
               <div className="btn-ember h-full" style={{ width: `${progress * 100}%` }} />
             </div>
-            <button onClick={() => abortRef.current?.abort()} className="mt-2 w-full rounded-xl bg-panel-2 py-2 text-sm">Cancel</button>
+            <button onClick={() => abortRef.current?.abort()} className="mt-2 w-full rounded-full bg-panel-2 py-2 font-mono text-xs uppercase tracking-[0.12em]">Cancel</button>
           </div>
         ) : (
           <button onClick={render} disabled={timeline.length === 0} className="btn-ember rounded-full py-3 font-semibold disabled:opacity-40">Render edit</button>

@@ -44,9 +44,7 @@ export default function Nav() {
     <header className="sticky top-0 z-30 bg-bg/85 backdrop-blur-md">
       <nav className="mx-auto flex h-16 max-w-7xl items-center gap-2 overflow-x-auto px-4" aria-label="Primary">
         <Link href="/explore" className="mr-4 flex shrink-0 items-center gap-2 text-lg font-medium tracking-tight">
-          <svg aria-hidden viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor">
-            <path d="M12 2c3.6 4.6 6 7.6 6 11.6A6 6 0 0 1 6 13.6c0-2.4 1.2-4.2 2.4-5.4.4 1.9 1.4 3 2.4 3 0-3.6 0-6 1.2-9.2Z" />
-          </svg>
+          <img src="/brand/kiln-mark.png" alt="" width={24} height={24} className="h-6 w-6" />
           Kiln
         </Link>
         <ul className="flex items-center gap-0.5">{CORE.map((i) => <NavLink key={i.href} item={i} path={path} />)}</ul>
